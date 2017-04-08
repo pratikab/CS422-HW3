@@ -21,7 +21,7 @@ VPATH= .:../../common:
 SUBDIRS=$(SIMDIR)/lib
 
 # extra flags used for simulation stuff... synchronous simulation env
-MORECFLAGS+=-DSYNCHRONOUS -DMIPS_FAST -I../../common $(GTK_FLAGS) -Wno-deprecated
+MORECFLAGS+=-DSYNCHRONOUS -DMIPS_FAST -I../../common $(GTK_FLAGS) -Wno-deprecated -include /usr/include/errno.h
 
 CORE:=mips.o exec_helper.o syscall.o decode.o executor.o memory.o wb.o
 MIPC:=main.o
