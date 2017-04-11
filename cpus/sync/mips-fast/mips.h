@@ -25,7 +25,35 @@ typedef unsigned Bool;
 #include "../../common/syscall.h"
 #include "queue.h"
 
-//#define MIPC_DEBUG 1
+#define MIPC_DEBUG 1
+
+class pipeline_reg{
+public:
+      unsigned int _ins;   // instruction register
+      signed int  _decodedSRC1, _decodedSRC2;   // Reg fetch output (source values)
+      unsigned _decodedDST;         // Decoder output (dest reg no)
+      unsigned    _subregOperand;         // Needed for lwl and lwr
+      unsigned _MAR;          // Memory address register
+      unsigned _opResultHi, _opResultLo;  // Result of operation
+      Bool  _memControl;         // Memory instruction?
+      Bool     _writeREG, _writeFREG;     // WB control
+      signed int  _branchOffset;
+      Bool  _hiWPort, _loWPort;     // WB control
+      unsigned _decodedShiftAmt;    // Shift amount
+      unsigned int _hi, _lo;        // mult, div destination
+      unsigned int   _pc;           // Program counter
+      unsigned int _lastbd;         // branch delay state
+      int      _btaken;          // taken branch (1 if taken, 0 if fall-through)
+      int      _bd;           // 1 if the next ins is delay slot
+      unsigned int   _btgt;            // branch target
+
+      Bool     _isSyscall;       // 1 if system call
+      Bool     _isIllegalOp;        // 1 if illegal opcode
+      pipeline_reg();
+      ~pipeline_reg();
+      void (*_opControl)(Mipc*, unsigned);
+      void (*_memOp)(Mipc*);
+};
 
 class Mipc : public SimObject {
 public:
@@ -47,47 +75,19 @@ public:
    void Dec (unsigned int ins);			// Decoder function
    void fake_syscall (unsigned int ins);	// System call interface
 
-   /* processor state */
-   unsigned int _ins;   // instruction register
-   Bool         _insValid;      // Needed for unpipelined design
-   Bool         _decodeValid;   // Needed for unpipelined design
-   Bool		_execValid;	// Needed for unpipelined design
-   Bool		_memValid;	// Needed for unpipelined design
-   Bool         _insDone;       // Needed for unpipelined design
-
-   signed int	_decodedSRC1, _decodedSRC2;	// Reg fetch output (source values)
-   unsigned	_decodedDST;			// Decoder output (dest reg no)
-   unsigned 	_subregOperand;			// Needed for lwl and lwr
-   unsigned	_MAR;				// Memory address register
-   unsigned	_opResultHi, _opResultLo;	// Result of operation
-   Bool 	_memControl;			// Memory instruction?
-   Bool		_writeREG, _writeFREG;		// WB control
-   signed int	_branchOffset;
-   Bool 	_hiWPort, _loWPort;		// WB control
-   unsigned	_decodedShiftAmt;		// Shift amount
-
-   unsigned int 	_gpr[32];		// general-purpose integer registers
+   unsigned int  _gpr[32];      // general-purpose integer registers
 
    union {
       unsigned int l[2];
       float f[2];
       double d;
-   } _fpr[16];					// floating-point registers (paired)
+   } _fpr[16];             // floating-point registers (paired)
+   /* processor state */
+   unsigned int   _pc;           // Program counter
+   unsigned int _boot;           // boot code loaded?
 
-   unsigned int _hi, _lo; 			// mult, div destination
-   unsigned int	_pc;				// Program counter
-   unsigned int _lastbd;			// branch delay state
-   unsigned int _boot;				// boot code loaded?
-
-   int 		_btaken; 			// taken branch (1 if taken, 0 if fall-through)
-   int 		_bd;				// 1 if the next ins is delay slot
-   unsigned int	_btgt;				// branch target
-
-   Bool		_isSyscall;			// 1 if system call
-   Bool		_isIllegalOp;			// 1 if illegal opcode
-
+   pipeline_reg IF_ID,ID_EX,EX_MEM,MEM_WB,WB_;
    // Simulation statistics counters
-
    LL	_nfetched;
    LL	_num_cond_br;
    LL	_num_jal;
@@ -101,8 +101,7 @@ public:
    Log	_l;
    int  _sim_exit;		// 1 on normal termination
 
-   void (*_opControl)(Mipc*, unsigned);
-   void (*_memOp)(Mipc*);
+   
 
    FILE *_debugLog;
 

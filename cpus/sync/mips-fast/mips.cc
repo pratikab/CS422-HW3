@@ -31,23 +31,17 @@ Mipc::MainLoop (void)
    _nfetched = 0;
 
    while (!_sim_exit) {
-     AWAIT_P_PHI0;	// @posedge
-     if (_insDone) {
-        addr = _pc;
-        ins = _mem->BEGetWord (addr, _mem->Read(addr & ~(LL)0x7));
-        AWAIT_P_PHI1;	// @negedge
+    AWAIT_P_PHI1;	// @posedge
+    addr = _pc;
+    ins = _mem->BEGetWord (addr, _mem->Read(addr & ~(LL)0x7));
+    // AWAIT_P_PHI1;	// @negedge
 #ifdef MIPC_DEBUG
-        fprintf(_debugLog, "<%llu> Fetched ins %#x from PC %#x\n", SIM_TIME, ins, _pc);
+      fprintf(_debugLog, "<%llu> Fetched ins %#x from PC %#x\n", SIM_TIME, ins, _pc);
 #endif
-        _ins = ins;
-        _insValid = TRUE;
-        _insDone = FALSE;
-        _nfetched++;
-        _bd = 0;
-     }
-     else {
-        PAUSE(1);
-     }
+    IF_ID._ins = ins;
+    IF_ID._pc = _pc;
+    _nfetched++;
+    IF_ID._bd = 0;
    }
 
    MipcDumpstats();
@@ -122,13 +116,7 @@ Mipc::Reboot (char *image)
       fclose (fp);
 
       // Reset state
-      _ins = 0;
-      _insValid = FALSE;
-      _decodeValid = FALSE;
-      _execValid = FALSE;
-      _memValid = FALSE;
-      _insDone = TRUE;
-
+      WB_._ins = 0;
       _num_load = 0;
       _num_store = 0;
       _fpinst = 0;
@@ -136,10 +124,10 @@ Mipc::Reboot (char *image)
       _num_jal = 0;
       _num_jr = 0;
 
-      _lastbd = 0;
-      _bd = 0;
-      _btaken = 0;
-      _btgt = 0xdeadbeef;
+      WB_._lastbd = 0;
+      WB_._bd = 0;
+      WB_._btaken = 0;
+      WB_._btgt = 0xdeadbeef;
       _sim_exit = 0;
       _pc = ParamGetInt ("Mipc.BootPC");	// Boom! GO
    }
@@ -192,4 +180,29 @@ LL
 MipcSysCall::GetTime (void)
 {
   return SIM_TIME;
+}
+
+pipeline_reg::pipeline_reg(void){
+   _ins = 0;   // instruction register
+   _decodedSRC1 = 0; 
+   _decodedSRC2 = 0;   // Reg fetch output (source values)
+   _decodedDST = 0;         // Decoder output (dest reg no)
+   _subregOperand = 0;         // Needed for lwl and lwr
+   _MAR = 0;          // Memory address register
+   _opResultHi = 0; _opResultLo = 0;  // Result of operation
+   _memControl = FALSE;         // Memory instruction?
+   _writeREG = FALSE; _writeFREG = FALSE;     // WB control
+   _branchOffset = 0;
+   _hiWPort = FALSE; _loWPort = FALSE;     // WB control
+   _decodedShiftAmt = 0;    // Shift amount
+   _hi = 0; _lo = 0;        // mult, div destination
+   _lastbd = 0;         // branch delay state
+   _btaken = 0;          // taken branch (1 if taken, 0 if fall-through)
+   _bd = 0;           // 1 if the next ins is delay slot
+   _btgt = 0;            // branch target
+
+   _isSyscall = FALSE;       // 1 if system call
+   _isIllegalOp = FALSE;        // 1 if illegal opcode
+}
+pipeline_reg::~pipeline_reg(void){
 }

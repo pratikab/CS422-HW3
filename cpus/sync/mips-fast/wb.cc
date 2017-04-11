@@ -23,23 +23,22 @@ Writeback::MainLoop (void)
    while (1) {
       AWAIT_P_PHI0;	// @posedge
       // Sample the important signals
-      if (_mc->_memValid) {
-         writeReg = _mc->_writeREG;
-         writeFReg = _mc->_writeFREG;
-         loWPort = _mc->_loWPort;
-         hiWPort = _mc->_hiWPort;
-         decodedDST = _mc->_decodedDST;
-         opResultLo = _mc->_opResultLo;
-         opResultHi = _mc->_opResultHi;
-         isSyscall = _mc->_isSyscall;
-         isIllegalOp = _mc->_isIllegalOp;
-         ins = _mc->_ins;
+         writeReg = _mc->MEM_WB._writeREG;
+         writeFReg = _mc->MEM_WB._writeFREG;
+         loWPort = _mc->MEM_WB._loWPort;
+         hiWPort = _mc->MEM_WB._hiWPort;
+         decodedDST = _mc->MEM_WB._decodedDST;
+         opResultLo = _mc->MEM_WB._opResultLo;
+         opResultHi = _mc->MEM_WB._opResultHi;
+         isSyscall = _mc->MEM_WB._isSyscall;
+         isIllegalOp = _mc->MEM_WB._isIllegalOp;
+         ins = _mc->MEM_WB._ins;
          AWAIT_P_PHI1;       // @negedge
          if (isSyscall) {
 #ifdef MIPC_DEBUG
             fprintf(_mc->_debugLog, "<%llu> SYSCALL! Trapping to emulation layer at PC %#x\n", SIM_TIME, _mc->_pc);
 #endif      
-            _mc->_opControl(_mc, ins);
+            _mc->EX_MEM._opControl(_mc, ins);
             _mc->_pc += 4;
          }
          else if (isIllegalOp) {
@@ -66,13 +65,13 @@ Writeback::MainLoop (void)
             }
             else if (loWPort || hiWPort) {
                if (loWPort) {
-                  _mc->_lo = opResultLo;
+                  _mc->EX_MEM._lo = opResultLo;
 #ifdef MIPC_DEBUG
                   fprintf(_mc->_debugLog, "<%llu> Writing to Lo, value: %#x\n", SIM_TIME, opResultLo);
 #endif
                }
                if (hiWPort) {
-                  _mc->_hi = opResultHi;
+                  _mc->EX_MEM._hi = opResultHi;
 #ifdef MIPC_DEBUG
                   fprintf(_mc->_debugLog, "<%llu> Writing to Hi, value: %#x\n", SIM_TIME, opResultHi);
 #endif
@@ -80,11 +79,6 @@ Writeback::MainLoop (void)
             }
          }
          _mc->_gpr[0] = 0;
-         _mc->_memValid = FALSE;
-         _mc->_insDone = TRUE;
       }
-      else {
-         PAUSE(1);
-      }
-   }
+   
 }
