@@ -49,7 +49,7 @@ Decode::MainLoop (void)
       // fprintf(_mc->_debugLog, "_lastbd = %d\n",_mc->IF_ID._lastbd);
       // fprintf(_mc->_debugLog, "_btaken = %d\n",_mc->IF_ID._btaken);
       // fprintf(_mc->_debugLog, "_bd = %d\n",_mc->IF_ID._bd);
-      // fprintf(_mc->_debugLog, "_btgt = %d\n",_mc->IF_ID._btgt);
+      fprintf(_mc->_debugLog, "_btgt = %#x\n",_mc->ID_EX._btgt);
       // fprintf(_mc->_debugLog, "_isSyscall = %d\n",_mc->ID_EX._isSyscall);
       // fprintf(_mc->_debugLog, "_isIllegalOp = %d\n",_mc->IF_ID._isIllegalOp);
 #endif

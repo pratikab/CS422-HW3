@@ -17,7 +17,8 @@ Exe::MainLoop (void)
    Bool loWPort;
    Bool hiWPort, memControl;
    unsigned decodedDST;
-   unsigned opResultLo, opResultHi;
+   unsigned opResultLo, opResultHi,lastbd, btgt;
+   int  btaken ,bd;
    void (*opControl)(Mipc*, unsigned);
    void (*memOp)(Mipc*);
 
@@ -35,7 +36,10 @@ Exe::MainLoop (void)
          hiWPort=_mc->ID_EX._hiWPort;
          decodedDST=_mc->ID_EX._decodedDST;
          opControl=_mc->ID_EX._opControl;
-
+         lastbd = _mc->ID_EX._lastbd;
+         btgt = _mc->ID_EX._btgt;
+         bd =_mc->ID_EX._bd;
+         _mc->EX_MEM._btaken = 0;
          if (!isSyscall && !isIllegalOp) {
             if (_mc->ID_EX._opControl != NULL)
                _mc->ID_EX._opControl(_mc,ins);
@@ -75,21 +79,28 @@ Exe::MainLoop (void)
 #ifdef MIPC_DEBUG
             fprintf(_mc->_debugLog, "<%llu> Illegal ins %#x in execution stage at PC %#x\n", SIM_TIME, ins, _mc->_pc);
 #endif
+
          }
+
+         btaken = _mc->EX_MEM._btaken;
+#ifdef MIPC_DEBUG
+            fprintf(_mc->_debugLog, "<%llu> [EXEC]Branch Taken =  %#x\n", SIM_TIME, btaken );
+#endif
          if (!isIllegalOp && !isSyscall) {
             if(!_mc->system_call_in_pipe){  
-               if (_mc->ID_EX._lastbd && _mc->ID_EX._btaken)
+               if (btaken)
                {
-                  _mc->_pc = _mc->ID_EX._btgt;
+                  _mc->_pc = btgt;
                }
                else
                {
                   _mc->_pc = _mc->_pc + 4;
                }
             }
-            _mc->EX_MEM._lastbd = _mc->ID_EX._bd; ////////////DOUBT
-         }
-             AWAIT_P_PHI1; // @negedge
+      }
+             
+   AWAIT_P_PHI1; // @negedge
+      
       _mc->EX_MEM._pc = pc;
       _mc->EX_MEM._ins = ins;
       _mc->EX_MEM._memControl = memControl;
@@ -102,5 +113,6 @@ Exe::MainLoop (void)
       _mc->EX_MEM._isSyscall = isSyscall;
       _mc->EX_MEM._isIllegalOp=isIllegalOp;
       _mc->EX_MEM._opControl=opControl;
+      _mc->EX_MEM._btaken = btaken;
       }
 }

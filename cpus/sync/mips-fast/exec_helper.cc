@@ -162,6 +162,7 @@ Mipc::Dec (unsigned int ins)
       case 9:			// jalr
          ID_EX._opControl = func_jalr;
          ID_EX._btgt = ID_EX._decodedSRC1;
+         // // cout << "jalr" << ID_EX._btgt << endl;
          ID_EX._bd = 1;
          break;
 
@@ -169,6 +170,8 @@ Mipc::Dec (unsigned int ins)
          ID_EX._opControl = func_jr;
          ID_EX._writeREG = FALSE;
          ID_EX._writeFREG = FALSE;
+                  // // cout << "jr"<< endl;
+
          ID_EX._btgt = ID_EX._decodedSRC1;
          ID_EX._bd = 1;
 	 break;
@@ -292,6 +295,8 @@ Mipc::Dec (unsigned int ins)
       ID_EX._branchOffset <<= 16; 
       ID_EX._branchOffset >>= 14; 
       ID_EX._bd = 1;
+               // // cout << "beq"<< endl;
+
       ID_EX._btgt = (unsigned)((signed)_pc+ID_EX._branchOffset+4);
       break;
 
@@ -311,6 +316,8 @@ Mipc::Dec (unsigned int ins)
          ID_EX._branchOffset <<= 16;
          ID_EX._branchOffset >>= 14;
          ID_EX._bd = 1;
+                  // cout << "bnez"<< endl;
+
          ID_EX._btgt = (unsigned)((signed)_pc+ID_EX._branchOffset+4);
 	 break;
 
@@ -321,6 +328,8 @@ Mipc::Dec (unsigned int ins)
          ID_EX._branchOffset <<= 16;
          ID_EX._branchOffset >>= 14;
          ID_EX._bd = 1;
+                  // // cout << "bgezal"<< endl;
+
          ID_EX._btgt = (unsigned)((signed)_pc+ID_EX._branchOffset+4);
 	 break;
 
@@ -331,6 +340,8 @@ Mipc::Dec (unsigned int ins)
          ID_EX._branchOffset <<= 16;
          ID_EX._branchOffset >>= 14;
          ID_EX._bd = 1;
+                  // cout << "bltzal"<< endl;
+
          ID_EX._btgt = (unsigned)((signed)_pc+ID_EX._branchOffset+4);
 	 break;
 
@@ -339,6 +350,8 @@ Mipc::Dec (unsigned int ins)
          ID_EX._branchOffset <<= 16;
          ID_EX._branchOffset >>= 14;
          ID_EX._bd = 1;
+                  // cout << "btlz"<< endl;
+
          ID_EX._btgt = (unsigned)((signed)_pc+ID_EX._branchOffset+4);
 	 break;
 
@@ -360,6 +373,8 @@ Mipc::Dec (unsigned int ins)
       ID_EX._branchOffset <<= 16;
       ID_EX._branchOffset >>= 14;
       ID_EX._bd = 1;
+               // cout << "bgtz"<< endl;
+
       ID_EX._btgt = (unsigned)((signed)_pc+ID_EX._branchOffset+4);
       break;
 
@@ -375,6 +390,8 @@ Mipc::Dec (unsigned int ins)
       ID_EX._branchOffset <<= 16;
       ID_EX._branchOffset >>= 14;
       ID_EX._bd = 1;
+               // cout << "blez"<< endl;
+
       ID_EX._btgt = (unsigned)((signed)_pc+ID_EX._branchOffset+4);
       break;
 
@@ -391,6 +408,8 @@ Mipc::Dec (unsigned int ins)
       ID_EX._branchOffset <<= 16;
       ID_EX._branchOffset >>= 14;
       ID_EX._bd = 1;
+               // cout << "btgt"<< endl;
+
       ID_EX._btgt = (unsigned)((signed)_pc+ID_EX._branchOffset+4);
       break;
 
@@ -402,6 +421,8 @@ Mipc::Dec (unsigned int ins)
       ID_EX._hiWPort = FALSE;
       ID_EX._loWPort = FALSE;
       ID_EX._memControl = FALSE;
+               // cout << "j"<< endl;
+
       ID_EX._btgt = ((_pc+4) & 0xf0000000) | (ID_EX._branchOffset<<2);
       ID_EX._bd = 1;
       break;
@@ -415,6 +436,8 @@ Mipc::Dec (unsigned int ins)
       ID_EX._hiWPort = FALSE;
       ID_EX._loWPort = FALSE;
       ID_EX._memControl = FALSE;
+               // cout << "jal"<< endl;
+
       ID_EX._btgt = ((_pc+4) & 0xf0000000) | (ID_EX._branchOffset<<2);
       ID_EX._bd = 1;
       break;
@@ -707,7 +730,7 @@ Mipc::func_sll (Mipc *mc, unsigned ins)
 void
 Mipc::func_sllv (Mipc *mc, unsigned ins)
 {
-   mc->EX_MEM._opResultLo = mc->ID_EX._decodedSRC2 << (mc->ID_EX._decodedShiftAmt);
+   mc->EX_MEM._opResultLo = mc->ID_EX._decodedSRC2 << (mc->ID_EX._decodedSRC1);
  //printf("WARN: sllv");	   
 //printf("Encountered unimplemented instruction: sllv.\n");
    //printf("You need to fill in func_sllv in exec_helper.cc to proceed forward.\n");
