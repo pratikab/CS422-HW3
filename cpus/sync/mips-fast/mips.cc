@@ -1,6 +1,7 @@
 #include "mips.h"
 #include <assert.h>
 #include "mips-irix5.h"
+#include "iostream.h"
 
 Mipc::Mipc (Mem *m) : _l('M')
 {
@@ -31,12 +32,36 @@ Mipc::MainLoop (void)
    _nfetched = 0;
 
    while (!_sim_exit) {
+    AWAIT_P_PHI0;
     AWAIT_P_PHI1;	// @posedge
     addr = _pc;
     ins = _mem->BEGetWord (addr, _mem->Read(addr & ~(LL)0x7));
     // AWAIT_P_PHI1;	// @negedge
 #ifdef MIPC_DEBUG
       fprintf(_debugLog, "<%llu> Fetched ins %#x from PC %#x\n", SIM_TIME, ins, _pc);
+      // fprintf(_debugLog, "_ins = %d\n",_ins);
+      // fprintf(_debugLog, "_decodedSRC1 = %d\n",_decodedSRC1);
+      // fprintf(_debugLog, "_decodedSRC2 = %d\n",_decodedSRC2);
+      // fprintf(_debugLog, "_decodedDST = %d\n",_decodedDST);
+      // fprintf(_debugLog, "_subregOperand = %d\n",_subregOperand);
+      // fprintf(_debugLog, "_MAR = %d\n",_MAR);
+      // fprintf(_debugLog, "_opResultHi = %d\n",_opResultHi);
+      // fprintf(_debugLog, "_opResultLo = %d\n",_opResultLo);
+      // fprintf(_debugLog, "_memControl = %d\n",_memControl);
+      // fprintf(_debugLog, "_writeREG = %d\n",_writeREG);
+      // fprintf(_debugLog, "_writeFREG = %d\n",_writeFREG);
+      // fprintf(_debugLog, "_branchOffset = %d\n",_branchOffset);
+      // fprintf(_debugLog, "_hiWPort = %d\n",_hiWPort);
+      // fprintf(_debugLog, "_loWPort = %d\n",_loWPort);
+      // fprintf(_debugLog, "_decodedShiftAmt = %d\n",_decodedShiftAmt);
+      // fprintf(_debugLog, "_hi = %d\n",_hi);
+      // fprintf(_debugLog, "_lo = %d\n",_lo);
+      // fprintf(_debugLog, "_lastbd = %d\n",_lastbd);
+      // fprintf(_debugLog, "_btaken = %d\n",_btaken);
+      // fprintf(_debugLog, "_bd = %d\n",_bd);
+      // fprintf(_debugLog, "_btgt = %d\n",_btgt);
+      // fprintf(_debugLog, "_isSyscall = %d\n",_isSyscall);
+      // fprintf(_debugLog, "_isIllegalOp = %d\n",_isIllegalOp);
 #endif
     IF_ID._ins = ins;
     IF_ID._pc = _pc;
@@ -203,6 +228,8 @@ pipeline_reg::pipeline_reg(void){
 
    _isSyscall = FALSE;       // 1 if system call
    _isIllegalOp = FALSE;        // 1 if illegal opcode
+
+   _opControl = NULL;
 }
 pipeline_reg::~pipeline_reg(void){
 }

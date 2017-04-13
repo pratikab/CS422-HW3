@@ -1,5 +1,5 @@
 #include "wb.h"
-
+#include "iostream.h"
 Writeback::Writeback (Mipc *mc)
 {
    _mc = mc;
@@ -19,6 +19,7 @@ Writeback::MainLoop (void)
    Bool isIllegalOp;
    unsigned decodedDST;
    unsigned opResultLo, opResultHi;
+   void (*opControl)(Mipc*, unsigned);
 
    while (1) {
       AWAIT_P_PHI0;	// @posedge
@@ -30,16 +31,20 @@ Writeback::MainLoop (void)
          decodedDST = _mc->MEM_WB._decodedDST;
          opResultLo = _mc->MEM_WB._opResultLo;
          opResultHi = _mc->MEM_WB._opResultHi;
-         isSyscall = _mc->MEM_WB._isSyscall;
          isIllegalOp = _mc->MEM_WB._isIllegalOp;
+         isSyscall = _mc->MEM_WB._isSyscall;
+         opControl = _mc->MEM_WB._opControl;
          ins = _mc->MEM_WB._ins;
-         AWAIT_P_PHI1;       // @negedge
+         
+      AWAIT_P_PHI1;       // @negedge
+         
          if (isSyscall) {
 #ifdef MIPC_DEBUG
             fprintf(_mc->_debugLog, "<%llu> SYSCALL! Trapping to emulation layer at PC %#x\n", SIM_TIME, _mc->_pc);
 #endif      
-            _mc->EX_MEM._opControl(_mc, ins);
+            opControl(_mc, ins);
             _mc->_pc += 4;
+
          }
          else if (isIllegalOp) {
             printf("Illegal ins %#x at PC %#x. Terminating simulation!\n", ins, _mc->_pc);
