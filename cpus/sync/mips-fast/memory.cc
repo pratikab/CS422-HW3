@@ -35,7 +35,9 @@ Memory::MainLoop (void)
          opResultHi=_mc->EX_MEM._opResultHi;
          isSyscall=_mc->EX_MEM._isSyscall;
          isIllegalOp=_mc->EX_MEM._isIllegalOp;
-         opControl=_mc->EX_MEM._opControl;         
+         opControl=_mc->EX_MEM._opControl;      
+
+         AWAIT_P_PHI1;  // @negedge   
          if (memControl) {
             _mc->EX_MEM._memOp(_mc);
 
@@ -72,7 +74,6 @@ Memory::MainLoop (void)
 #endif
          }
 
-      AWAIT_P_PHI1;  // @negedge
       _mc->MEM_WB._pc = pc;
       _mc->MEM_WB._ins = ins;
       _mc->MEM_WB._writeREG=writeREG;

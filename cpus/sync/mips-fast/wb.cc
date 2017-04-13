@@ -36,7 +36,6 @@ Writeback::MainLoop (void)
          opControl = _mc->MEM_WB._opControl;
          ins = _mc->MEM_WB._ins;
          
-      AWAIT_P_PHI1;       // @negedge
          
          if (isSyscall) {
 #ifdef MIPC_DEBUG
@@ -84,6 +83,8 @@ Writeback::MainLoop (void)
             }
          }
          _mc->_gpr[0] = 0;
+               AWAIT_P_PHI1;       // @negedge
+
       }
    
 }

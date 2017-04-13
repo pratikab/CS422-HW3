@@ -10,13 +10,14 @@ Decode::~Decode (void) {}
 void
 Decode::MainLoop (void)
 {
-   unsigned int ins;
+   unsigned int ins,pc;
    while (1) {
       AWAIT_P_PHI0;	// @posedge
       ins = _mc->IF_ID._ins;
+      pc =  _mc->IF_ID._pc;;
       _mc->Dec(ins);
       AWAIT_P_PHI1;	// @negedge
-      _mc->ID_EX._pc = _mc->IF_ID._pc;
+      _mc->ID_EX._pc = pc;
       _mc->ID_EX._ins = ins;
 #ifdef MIPC_DEBUG
       fprintf(_mc->_debugLog, "<%llu> Decoded ins %#x\n", SIM_TIME, ins);
