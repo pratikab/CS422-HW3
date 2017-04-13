@@ -50,6 +50,7 @@ public:
       Bool     _isSyscall;       // 1 if system call
       Bool     _isIllegalOp;        // 1 if illegal opcode
       pipeline_reg();
+      void reset();
       ~pipeline_reg();
       void (*_opControl)(Mipc*, unsigned);
       void (*_memOp)(Mipc*);
@@ -85,8 +86,10 @@ public:
    /* processor state */
    unsigned int   _pc;           // Program counter
    unsigned int _boot;           // boot code loaded?
+   bool system_call_in_pipe;
+   unsigned int   set_pc;           // Program counter
 
-   pipeline_reg IF_ID,ID_EX,EX_MEM,MEM_WB,WB_;
+   pipeline_reg IF_ID,ID_EX,EX_MEM,MEM_WB;
    // Simulation statistics counters
    LL	_nfetched;
    LL	_num_cond_br;

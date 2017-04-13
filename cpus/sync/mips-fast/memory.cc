@@ -42,7 +42,7 @@ Memory::MainLoop (void)
             _mc->EX_MEM._memOp(_mc);
 
 #ifdef MIPC_DEBUG
-            fprintf(_mc->_debugLog, "<%llu> Accessing memory at address %#x for ins %#x\n", SIM_TIME, _mc->EX_MEM._MAR, _mc->EX_MEM._ins);
+            fprintf(_mc->_debugLog, "<%llu> Accessing memory at address %#x for ins %#x\n", SIM_TIME, _mc->EX_MEM._MAR, ins);
             // fprintf(_mc->_debugLog, "_ins = %d\n",_mc->EX_MEM._ins);
             // fprintf(_mc->_debugLog, "_decodedSRC1 = %d\n",_mc->EX_MEM._decodedSRC1);
             // fprintf(_mc->_debugLog, "_decodedSRC2 = %d\n",_mc->EX_MEM._decodedSRC2);
@@ -64,13 +64,14 @@ Memory::MainLoop (void)
             // fprintf(_mc->_debugLog, "_btaken = %d\n",_mc->EX_MEM._btaken);
             // fprintf(_mc->_debugLog, "_bd = %d\n",_mc->EX_MEM._bd);
             // fprintf(_mc->_debugLog, "_btgt = %d\n",_mc->EX_MEM._btgt);
-            // fprintf(_mc->_debugLog, "_isSyscall = %d\n",_mc->EX_MEM._isSyscall);
+            // fprintf(_mc->_debugLog, "_isSyscall = %d\n",isSyscall);
             // fprintf(_mc->_debugLog, "_isIllegalOp = %d\n",_mc->EX_MEM._isIllegalOp);
 #endif
          }
          else {
 #ifdef MIPC_DEBUG
-            fprintf(_mc->_debugLog, "<%llu> Memory has nothing to do for ins %#x\n", SIM_TIME, _mc->EX_MEM._ins);
+            fprintf(_mc->_debugLog, "<%llu> Memory has nothing to do for ins %#x\n", SIM_TIME, ins);
+
 #endif
          }
 

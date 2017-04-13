@@ -15,10 +15,18 @@ Decode::MainLoop (void)
       AWAIT_P_PHI0;	// @posedge
       ins = _mc->IF_ID._ins;
       pc =  _mc->IF_ID._pc;;
-      _mc->Dec(ins);
       AWAIT_P_PHI1;	// @negedge
+            _mc->Dec(ins);
+
       _mc->ID_EX._pc = pc;
       _mc->ID_EX._ins = ins;
+      if(_mc->ID_EX._isSyscall){
+#ifdef MIPC_DEBUG
+      fprintf(_mc->_debugLog, "<%llu> SYS CALL FOUND in ins %#x\n", SIM_TIME, ins);
+#endif
+            _mc->IF_ID.reset();
+            _mc->system_call_in_pipe = TRUE;
+      }
 #ifdef MIPC_DEBUG
       fprintf(_mc->_debugLog, "<%llu> Decoded ins %#x\n", SIM_TIME, ins);
       // fprintf(_mc->_debugLog, "_ins = %d\n",_mc->IF_ID._ins);
@@ -42,7 +50,7 @@ Decode::MainLoop (void)
       // fprintf(_mc->_debugLog, "_btaken = %d\n",_mc->IF_ID._btaken);
       // fprintf(_mc->_debugLog, "_bd = %d\n",_mc->IF_ID._bd);
       // fprintf(_mc->_debugLog, "_btgt = %d\n",_mc->IF_ID._btgt);
-      // fprintf(_mc->_debugLog, "_isSyscall = %d\n",_mc->IF_ID._isSyscall);
+      // fprintf(_mc->_debugLog, "_isSyscall = %d\n",_mc->ID_EX._isSyscall);
       // fprintf(_mc->_debugLog, "_isIllegalOp = %d\n",_mc->IF_ID._isIllegalOp);
 #endif
       }

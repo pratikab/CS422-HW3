@@ -10,13 +10,32 @@ Exe::~Exe (void) {}
 void
 Exe::MainLoop (void)
 {
-   unsigned int ins;
-   Bool isSyscall, isIllegalOp;
+   unsigned int ins,pc;
+   Bool isSyscall, isIllegalOp, flag = FALSE;
+   Bool writeREG;
+   Bool writeFREG;
+   Bool loWPort;
+   Bool hiWPort, memControl;
+   unsigned decodedDST;
+   unsigned opResultLo, opResultHi;
+   void (*opControl)(Mipc*, unsigned);
+   void (*memOp)(Mipc*);
+
    while (1) {
       AWAIT_P_PHI0;	// @posedge
          ins = _mc->ID_EX._ins;
          isSyscall = _mc->ID_EX._isSyscall;
          isIllegalOp = _mc->ID_EX._isIllegalOp;
+         pc = _mc->ID_EX._pc;
+         memControl = _mc->ID_EX._memControl;
+         memOp = _mc->ID_EX._memOp;
+         writeREG=_mc->ID_EX._writeREG;
+         writeFREG=_mc->ID_EX._writeFREG;
+         loWPort=_mc->ID_EX._loWPort;
+         hiWPort=_mc->ID_EX._hiWPort;
+         decodedDST=_mc->ID_EX._decodedDST;
+         opControl=_mc->ID_EX._opControl;
+
          if (!isSyscall && !isIllegalOp) {
             if (_mc->ID_EX._opControl != NULL)
                _mc->ID_EX._opControl(_mc,ins);
@@ -43,7 +62,7 @@ Exe::MainLoop (void)
             // fprintf(_mc->_debugLog, "_btaken = %d\n",_mc->ID_EX._btaken);
             // fprintf(_mc->_debugLog, "_bd = %d\n",_mc->ID_EX._bd);
             // fprintf(_mc->_debugLog, "_btgt = %d\n",_mc->ID_EX._btgt);
-            // fprintf(_mc->_debugLog, "_isSyscall = %d\n",_mc->ID_EX._isSyscall);
+             // fprintf(_mc->_debugLog, "_isSyscall = %d\n",isSyscall);
             // fprintf(_mc->_debugLog, "_isIllegalOp = %d\n",_mc->ID_EX._isIllegalOp);
 #endif
          }
@@ -57,30 +76,31 @@ Exe::MainLoop (void)
             fprintf(_mc->_debugLog, "<%llu> Illegal ins %#x in execution stage at PC %#x\n", SIM_TIME, ins, _mc->_pc);
 #endif
          }
-
          if (!isIllegalOp && !isSyscall) {
-            if (_mc->ID_EX._lastbd && _mc->ID_EX._btaken)
-            {
-               _mc->_pc = _mc->ID_EX._btgt;
-            }
-            else
-            {
-               _mc->_pc = _mc->_pc + 4;
+            if(!_mc->system_call_in_pipe){  
+               if (_mc->ID_EX._lastbd && _mc->ID_EX._btaken)
+               {
+                  _mc->_pc = _mc->ID_EX._btgt;
+               }
+               else
+               {
+                  _mc->_pc = _mc->_pc + 4;
+               }
             }
             _mc->EX_MEM._lastbd = _mc->ID_EX._bd; ////////////DOUBT
          }
-      AWAIT_P_PHI1; // @negedge
-      _mc->EX_MEM._pc = _mc->ID_EX._pc;
+             AWAIT_P_PHI1; // @negedge
+      _mc->EX_MEM._pc = pc;
       _mc->EX_MEM._ins = ins;
-      _mc->EX_MEM._memControl = _mc->ID_EX._memControl;
-      _mc->EX_MEM._memOp = _mc->ID_EX._memOp;
-      _mc->EX_MEM._writeREG=_mc->ID_EX._writeREG;
-      _mc->EX_MEM._writeFREG=_mc->ID_EX._writeFREG;
-      _mc->EX_MEM._loWPort=_mc->ID_EX._loWPort;
-      _mc->EX_MEM._hiWPort=_mc->ID_EX._hiWPort;
-      _mc->EX_MEM._decodedDST=_mc->ID_EX._decodedDST;
-      _mc->EX_MEM._isSyscall=_mc->ID_EX._isSyscall;
-      _mc->EX_MEM._isIllegalOp=_mc->ID_EX._isIllegalOp;
-      _mc->EX_MEM._opControl=_mc->ID_EX._opControl;
+      _mc->EX_MEM._memControl = memControl;
+      _mc->EX_MEM._memOp = memOp;
+      _mc->EX_MEM._writeREG=writeREG;
+      _mc->EX_MEM._writeFREG=writeFREG;
+      _mc->EX_MEM._loWPort=loWPort;
+      _mc->EX_MEM._hiWPort=hiWPort;
+      _mc->EX_MEM._decodedDST=decodedDST;
+      _mc->EX_MEM._isSyscall = isSyscall;
+      _mc->EX_MEM._isIllegalOp=isIllegalOp;
+      _mc->EX_MEM._opControl=opControl;
       }
 }
