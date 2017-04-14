@@ -33,6 +33,7 @@ Mipc::Dec (unsigned int ins)
    isLoad = FALSE;
    load_lock = FALSE;
    toUpdateBranch = FALSE;
+   isStore = FALSE;
 
    i.data = ins;
   
@@ -577,6 +578,7 @@ Mipc::Dec (unsigned int ins)
       ID_EX._hiWPort = FALSE;
       ID_EX._loWPort = FALSE;
       ID_EX._memControl = TRUE;
+      isStore = TRUE;
       break;
 
    case 0x28:			// sb
@@ -591,6 +593,8 @@ Mipc::Dec (unsigned int ins)
       ID_EX._hiWPort = FALSE;
       ID_EX._loWPort = FALSE;
       ID_EX._memControl = TRUE;
+      isStore = TRUE;
+
       break;
 
    case 0x29:			// sh  store half word
@@ -605,6 +609,8 @@ Mipc::Dec (unsigned int ins)
       ID_EX._hiWPort = FALSE;
       ID_EX._loWPort = FALSE;
       ID_EX._memControl = TRUE;
+      isStore = TRUE;
+
       break;
 
    case 0x2a:			// swl
@@ -619,6 +625,8 @@ Mipc::Dec (unsigned int ins)
       ID_EX._hiWPort = FALSE;
       ID_EX._loWPort = FALSE;
       ID_EX._memControl = TRUE;
+      isStore = TRUE;
+
       break;
 
    case 0x2b:			// sw
@@ -633,6 +641,8 @@ Mipc::Dec (unsigned int ins)
       ID_EX._hiWPort = FALSE;
       ID_EX._loWPort = FALSE;
       ID_EX._memControl = TRUE;
+      isStore = TRUE;
+
       break;
 
    case 0x2e:			// swr
@@ -647,6 +657,8 @@ Mipc::Dec (unsigned int ins)
       ID_EX._hiWPort = FALSE;
       ID_EX._loWPort = FALSE;
       ID_EX._memControl = TRUE;
+      isStore = TRUE;
+
       break;
 
    case 0x11:			// floating-point
@@ -695,16 +707,21 @@ Mipc::Dec (unsigned int ins)
    prev2DST = prev1DST;
    prev1DST = currDST;
    currDST = ID_EX._decodedDST;
-   prev_isLoad = isLoad;
+   prev_isLoad = currLoad; 
+   currLoad = isLoad;
    prevMEM = currMEM;
    currMEM = ID_EX._memControl;
-#ifdef MIPC_DEBUG
-            // fprintf(_debugLog, "***subreg1 = %d *** subreg2 = %d ** %#x\n",ID_EX.src1reg,ID_EX.src2reg,currDST);
+   isStore3 = isStore2;
+   isStore2 = isStore1;
+   isStore1 = isStore;
 
-#endif
 // #ifdef MIPC_DEBUG
-//             fprintf(_debugLog, "<%llu> Current Memory instruction status %#x\n", SIM_TIME, currMEM);
-//             fprintf(_debugLog, "<%llu> Previous Memory instruction status %#x\n", SIM_TIME, prevMEM);
+//             // fprintf(_debugLog, "***subreg1 = %d *** subreg2 = %d ** %#x\n",ID_EX.src1reg,ID_EX.src2reg,currDST);
+
+// #endif
+// #ifdef MIPC_DEBUG
+//             fprintf(_debugLog, " ********Current Load instruction status %d ** %d ** %d\n", currLoad,prev_isLoad);
+//             // fprintf(_debugLog, "<%llu> Previous Memory instruction status %#x\n", SIM_TIME, prevMEM);
 
 // #endif
 }
@@ -1230,12 +1247,15 @@ Mipc::mem_lb (Mipc *mc)
    a1 = mc->_mem->BEGetByte(mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7));
    SIGN_EXTEND_BYTE(a1);
    mc->MEM_WB._opResultLo = a1;
+   mc->flag_toChangeOpresult = TRUE;
 }
 
 void
 Mipc::mem_lbu (Mipc *mc)
 {
    mc->MEM_WB._opResultLo = mc->_mem->BEGetByte(mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7));
+      mc->flag_toChangeOpresult = TRUE;
+
 }
 
 void
@@ -1246,12 +1266,16 @@ Mipc::mem_lh (Mipc *mc)
    a1 = mc->_mem->BEGetHalfWord(mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7));
    SIGN_EXTEND_IMM(a1);
    mc->MEM_WB._opResultLo = a1;
+      mc->flag_toChangeOpresult = TRUE;
+
 }
 
 void
 Mipc::mem_lhu (Mipc *mc)
 {
    mc->MEM_WB._opResultLo = mc->_mem->BEGetHalfWord (mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7));
+      mc->flag_toChangeOpresult = TRUE;
+
 }
 
 void
@@ -1263,12 +1287,16 @@ Mipc::mem_lwl (Mipc *mc)
    a1 = mc->_mem->BEGetWord (mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7));
    s1 = (mc->EX_MEM._MAR & 3) << 3;
    mc->MEM_WB._opResultLo = (a1 << s1) | (mc->EX_MEM._subregOperand & ~(~0UL << s1));
+      mc->flag_toChangeOpresult = TRUE;
+
 }
 
 void
 Mipc::mem_lw (Mipc *mc)
 {
    mc->MEM_WB._opResultLo = mc->_mem->BEGetWord (mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7));
+      mc->flag_toChangeOpresult = TRUE;
+
 }
 
 void
@@ -1279,12 +1307,16 @@ Mipc::mem_lwr (Mipc *mc)
    ar1 = mc->_mem->BEGetWord (mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7));
    s1 = (~mc->EX_MEM._MAR & 3) << 3;
    mc->MEM_WB._opResultLo = (ar1 >> s1) | (mc->EX_MEM._subregOperand & ~(~(unsigned)0 >> s1));
+      mc->flag_toChangeOpresult = TRUE;
+
 }
 
 void
 Mipc::mem_lwc1 (Mipc *mc)
 {
    mc->MEM_WB._opResultLo = mc->_mem->BEGetWord (mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7));
+      mc->flag_toChangeOpresult = TRUE;
+
 }
 
 void

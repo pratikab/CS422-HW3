@@ -89,7 +89,7 @@ public:
    bool system_call_in_pipe;
    unsigned int   set_pc,set_pc_2,set_pc_3,set_ins;           // Program counter
    Bool prev_isLoad;
-   Bool isLoad;
+   Bool isLoad,currLoad;
    Bool load_lock;
    Bool currMEM, prevMEM;
    unsigned opRLo, opRHi, mar;
@@ -98,6 +98,8 @@ public:
 
 
    unsigned int prev1DST, prev2DST, currDST; 
+   Bool isStore,isStore1,isStore2,isStore3;
+   Bool flag_toChangeOpresult;
 
    pipeline_reg IF_ID,ID_EX,EX_MEM,MEM_WB;
    // Simulation statistics counters

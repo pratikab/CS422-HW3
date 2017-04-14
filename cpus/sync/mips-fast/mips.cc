@@ -32,12 +32,15 @@ Mipc::MainLoop (void)
    Assert (_boot, "Mipc::MainLoop() called without boot?");
     bool flag = TRUE;
     prev_isLoad = FALSE;
+    currLoad = FALSE;
     isLoad = FALSE;
    _nfetched = 0;
    load_lock = FALSE;
    currMEM = FALSE;
    prevMEM = FALSE;
+   flag_toChangeOpresult = FALSE;
     prev1DST=1000; prev2DST = 1000; currDST= 1000; 
+    isStore = FALSE;isStore1 = FALSE;isStore2 = FALSE;isStore3 = FALSE;
     opRLo = 0; opRHi=0; b_taken = 0;
     mar = 0;
     toUpdateBranch = FALSE;

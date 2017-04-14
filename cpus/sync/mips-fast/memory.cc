@@ -23,6 +23,7 @@ Memory::MainLoop (void)
    void (*opControl)(Mipc*, unsigned);
    while (1) {
       AWAIT_P_PHI0;       // @posedge
+         _mc->flag_toChangeOpresult = FALSE;
          memControl = _mc->EX_MEM._memControl;
          pc = _mc->EX_MEM._pc;
          ins = _mc->EX_MEM._ins;
@@ -59,7 +60,9 @@ Memory::MainLoop (void)
       _mc->MEM_WB._loWPort=loWPort;
       _mc->MEM_WB._hiWPort=hiWPort;
       _mc->MEM_WB._decodedDST=decodedDST;
-      _mc->MEM_WB._opResultLo=opResultLo;
+      if(!_mc->flag_toChangeOpresult){
+         _mc->MEM_WB._opResultLo=opResultLo;
+      }
       _mc->MEM_WB._opResultHi=opResultHi;
       _mc->MEM_WB._isSyscall=isSyscall;
       _mc->MEM_WB._isIllegalOp=isIllegalOp;
