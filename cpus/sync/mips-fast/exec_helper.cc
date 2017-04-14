@@ -1244,7 +1244,7 @@ Mipc::mem_lb (Mipc *mc)
 {
    signed int a1;
 
-   a1 = mc->_mem->BEGetByte(mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7));
+   a1 = mc->_mem->BEGetByte(mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7));
    SIGN_EXTEND_BYTE(a1);
    mc->MEM_WB._opResultLo = a1;
    mc->flag_toChangeOpresult = TRUE;
@@ -1253,7 +1253,7 @@ Mipc::mem_lb (Mipc *mc)
 void
 Mipc::mem_lbu (Mipc *mc)
 {
-   mc->MEM_WB._opResultLo = mc->_mem->BEGetByte(mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7));
+   mc->MEM_WB._opResultLo = mc->_mem->BEGetByte(mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7));
       mc->flag_toChangeOpresult = TRUE;
 
 }
@@ -1263,7 +1263,7 @@ Mipc::mem_lh (Mipc *mc)
 {
    signed int a1;
 
-   a1 = mc->_mem->BEGetHalfWord(mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7));
+   a1 = mc->_mem->BEGetHalfWord(mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7));
    SIGN_EXTEND_IMM(a1);
    mc->MEM_WB._opResultLo = a1;
       mc->flag_toChangeOpresult = TRUE;
@@ -1273,7 +1273,7 @@ Mipc::mem_lh (Mipc *mc)
 void
 Mipc::mem_lhu (Mipc *mc)
 {
-   mc->MEM_WB._opResultLo = mc->_mem->BEGetHalfWord (mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7));
+   mc->MEM_WB._opResultLo = mc->_mem->BEGetHalfWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7));
       mc->flag_toChangeOpresult = TRUE;
 
 }
@@ -1284,9 +1284,9 @@ Mipc::mem_lwl (Mipc *mc)
    signed int a1;
    unsigned s1;
 
-   a1 = mc->_mem->BEGetWord (mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7));
-   s1 = (mc->EX_MEM._MAR & 3) << 3;
-   mc->MEM_WB._opResultLo = (a1 << s1) | (mc->EX_MEM._subregOperand & ~(~0UL << s1));
+   a1 = mc->_mem->BEGetWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7));
+   s1 = (mc->tempMAR & 3) << 3;
+   mc->MEM_WB._opResultLo = (a1 << s1) | (mc->tempSubregOperand & ~(~0UL << s1));
       mc->flag_toChangeOpresult = TRUE;
 
 }
@@ -1294,7 +1294,7 @@ Mipc::mem_lwl (Mipc *mc)
 void
 Mipc::mem_lw (Mipc *mc)
 {
-   mc->MEM_WB._opResultLo = mc->_mem->BEGetWord (mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7));
+   mc->MEM_WB._opResultLo = mc->_mem->BEGetWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7));
       mc->flag_toChangeOpresult = TRUE;
 
 }
@@ -1304,9 +1304,9 @@ Mipc::mem_lwr (Mipc *mc)
 {
    unsigned ar1, s1;
 
-   ar1 = mc->_mem->BEGetWord (mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7));
-   s1 = (~mc->EX_MEM._MAR & 3) << 3;
-   mc->MEM_WB._opResultLo = (ar1 >> s1) | (mc->EX_MEM._subregOperand & ~(~(unsigned)0 >> s1));
+   ar1 = mc->_mem->BEGetWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7));
+   s1 = (~mc->tempMAR & 3) << 3;
+   mc->MEM_WB._opResultLo = (ar1 >> s1) | (mc->tempSubregOperand & ~(~(unsigned)0 >> s1));
       mc->flag_toChangeOpresult = TRUE;
 
 }
@@ -1314,7 +1314,7 @@ Mipc::mem_lwr (Mipc *mc)
 void
 Mipc::mem_lwc1 (Mipc *mc)
 {
-   mc->MEM_WB._opResultLo = mc->_mem->BEGetWord (mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7));
+   mc->MEM_WB._opResultLo = mc->_mem->BEGetWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7));
       mc->flag_toChangeOpresult = TRUE;
 
 }
@@ -1322,19 +1322,19 @@ Mipc::mem_lwc1 (Mipc *mc)
 void
 Mipc::mem_swc1 (Mipc *mc)
 {
-   mc->_mem->Write(mc->EX_MEM._MAR & ~(LL)0x7, mc->_mem->BESetWord (mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7), mc->_fpr[mc->EX_MEM._decodedDST>>1].l[FP_TWIDDLE^(mc->EX_MEM._decodedDST&1)]));
+   mc->_mem->Write(mc->tempMAR & ~(LL)0x7, mc->_mem->BESetWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7), mc->_fpr[mc->tempDecodedDST>>1].l[FP_TWIDDLE^(mc->tempDecodedDST&1)]));
 }
 
 void
 Mipc::mem_sb (Mipc *mc)
 {
-   mc->_mem->Write(mc->EX_MEM._MAR & ~(LL)0x7, mc->_mem->BESetByte (mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7), mc->_gpr[mc->EX_MEM._decodedDST] & 0xff));
+   mc->_mem->Write(mc->tempMAR & ~(LL)0x7, mc->_mem->BESetByte (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7), mc->_gpr[mc->tempDecodedDST] & 0xff));
 }
 
 void
 Mipc::mem_sh (Mipc *mc)
 {
-   mc->_mem->Write(mc->EX_MEM._MAR & ~(LL)0x7, mc->_mem->BESetHalfWord (mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7), mc->_gpr[mc->EX_MEM._decodedDST] & 0xffff));
+   mc->_mem->Write(mc->tempMAR & ~(LL)0x7, mc->_mem->BESetHalfWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7), mc->_gpr[mc->tempDecodedDST] & 0xffff));
 }
 
 void
@@ -1342,16 +1342,16 @@ Mipc::mem_swl (Mipc *mc)
 {
    unsigned ar1, s1;
 
-   ar1 = mc->_mem->BEGetWord (mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7));
-   s1 = (mc->EX_MEM._MAR & 3) << 3;
-   ar1 = (mc->_gpr[mc->EX_MEM._decodedDST] >> s1) | (ar1 & ~(~(unsigned)0 >> s1));
-   mc->_mem->Write(mc->EX_MEM._MAR & ~(LL)0x7, mc->_mem->BESetWord (mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7), ar1));
+   ar1 = mc->_mem->BEGetWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7));
+   s1 = (mc->tempMAR & 3) << 3;
+   ar1 = (mc->_gpr[mc->tempDecodedDST] >> s1) | (ar1 & ~(~(unsigned)0 >> s1));
+   mc->_mem->Write(mc->tempMAR & ~(LL)0x7, mc->_mem->BESetWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7), ar1));
 }
 
 void
 Mipc::mem_sw (Mipc *mc)
 {
-   mc->_mem->Write(mc->EX_MEM._MAR & ~(LL)0x7, mc->_mem->BESetWord (mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7), mc->_gpr[mc->EX_MEM._decodedDST]));
+   mc->_mem->Write(mc->tempMAR & ~(LL)0x7, mc->_mem->BESetWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7), mc->_gpr[mc->tempDecodedDST]));
 }
 
 void
@@ -1359,8 +1359,8 @@ Mipc::mem_swr (Mipc *mc)
 {
    unsigned ar1, s1;
 
-   ar1 = mc->_mem->BEGetWord (mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7));
-   s1 = (~mc->EX_MEM._MAR & 3) << 3;
-   ar1 = (mc->_gpr[mc->EX_MEM._decodedDST] << s1) | (ar1 & ~(~0UL << s1));
-   mc->_mem->Write(mc->EX_MEM._MAR & ~(LL)0x7, mc->_mem->BESetWord (mc->EX_MEM._MAR, mc->_mem->Read(mc->EX_MEM._MAR & ~(LL)0x7), ar1));
+   ar1 = mc->_mem->BEGetWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7));
+   s1 = (~mc->tempMAR & 3) << 3;
+   ar1 = (mc->_gpr[mc->tempDecodedDST] << s1) | (ar1 & ~(~0UL << s1));
+   mc->_mem->Write(mc->tempMAR & ~(LL)0x7, mc->_mem->BESetWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7), ar1));
 }

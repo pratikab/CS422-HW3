@@ -36,14 +36,17 @@ Memory::MainLoop (void)
          opResultHi=_mc->EX_MEM._opResultHi;
          isSyscall=_mc->EX_MEM._isSyscall;
          isIllegalOp=_mc->EX_MEM._isIllegalOp;
-         opControl=_mc->EX_MEM._opControl;      
+         opControl=_mc->EX_MEM._opControl;    
+         _mc->tempMAR = _mc->EX_MEM._MAR;
+         _mc->tempSubregOperand = _mc->EX_MEM._subregOperand;
+         _mc->tempDecodedDST =_mc->EX_MEM._decodedDST;
 
          AWAIT_P_PHI1;  // @negedge   
          if (memControl) {
             _mc->EX_MEM._memOp(_mc);
 
 #ifdef MIPC_DEBUG
-            fprintf(_mc->_debugLog, "<%llu> Accessing memory at address %#x for ins %#x\n", SIM_TIME, _mc->EX_MEM._MAR, ins);
+            fprintf(_mc->_debugLog, "<%llu> Accessing memory at address %#x for ins %#x\n", SIM_TIME, _mc->tempMAR, ins);
 #endif
          }
          else {
@@ -67,5 +70,6 @@ Memory::MainLoop (void)
       _mc->MEM_WB._isSyscall=isSyscall;
       _mc->MEM_WB._isIllegalOp=isIllegalOp;
       _mc->MEM_WB._opControl=opControl;
+     
    }
 }

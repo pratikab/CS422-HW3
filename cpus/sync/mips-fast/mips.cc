@@ -41,6 +41,7 @@ Mipc::MainLoop (void)
    flag_toChangeOpresult = FALSE;
     prev1DST=1000; prev2DST = 1000; currDST= 1000; 
     isStore = FALSE;isStore1 = FALSE;isStore2 = FALSE;isStore3 = FALSE;
+    tempMAR = 0;tempSubregOperand = 0;tempDecodedDST = 0;
     opRLo = 0; opRHi=0; b_taken = 0;
     mar = 0;
     toUpdateBranch = FALSE;

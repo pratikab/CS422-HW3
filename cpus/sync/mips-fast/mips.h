@@ -95,7 +95,7 @@ public:
    unsigned opRLo, opRHi, mar;
    Bool toUpdateBranch;
    unsigned int b_taken;
-
+   unsigned tempMAR,tempSubregOperand,tempDecodedDST;
 
    unsigned int prev1DST, prev2DST, currDST; 
    Bool isStore,isStore1,isStore2,isStore3;
