@@ -30,6 +30,7 @@ Exe::MainLoop (void)
    void (*memOp)(Mipc*);
    int source1, source2;
    unsigned mar_;
+   bool temp_isstore;
 
    while (1) {
       AWAIT_P_PHI0;	// @posedge
@@ -46,6 +47,7 @@ Exe::MainLoop (void)
          opControl=_mc->ID_EX._opControl;
          lastbd = _mc->ID_EX._lastbd;
          bd =_mc->ID_EX._bd;
+         temp_isstore = _mc->ID_EX.isstore;
          _mc->b_taken = 0;
 
          source1 = _mc->ID_EX.src1reg;
@@ -91,13 +93,13 @@ Exe::MainLoop (void)
                    _mc->ID_EX._btgt = _mc->MEM_WB._decodedSRC1;
                }
 #ifdef MIPC_DEBUG
-            fprintf(_mc->_debugLog, "MEM-EX bypass from %d to %d\n", _mc->prev1DST,source1);
+            fprintf(_mc->_debugLog, "MEM-EX bypass from %d to %d\n", _mc->prev2DST,source1);
 #endif            
             }
             else if(source2 == _mc->prev2DST){
                _mc->ID_EX._decodedSRC2 = _mc->MEM_WB._opResultLo;
 #ifdef MIPC_DEBUG
-            fprintf(_mc->_debugLog, "MEM-EX bypass from %d to %d\n",_mc->prev1DST,source2);
+            fprintf(_mc->_debugLog, "MEM-EX bypass from %d to %d\n",_mc->prev2DST,source2);
 #endif
             }  
          }        
@@ -105,11 +107,8 @@ Exe::MainLoop (void)
          if (!isSyscall && !isIllegalOp) {
             if (_mc->ID_EX._opControl != NULL)
                _mc->ID_EX._opControl(_mc,ins);
-               if(_mc->load_lock){
-                  load_interlock(_mc);
-               }
 #ifdef MIPC_DEBUG
-            fprintf(_mc->_debugLog, "<%llu> Executed ins %#x\n", SIM_TIME, ins);
+            fprintf(_mc->_debugLog, "<%llu> Executed ins %#x OutPut = %#x\n", SIM_TIME, ins,_mc->opRLo);
 #endif
          }
          else if (isSyscall) {
@@ -144,7 +143,7 @@ Exe::MainLoop (void)
       
       _mc->EX_MEM._pc = pc;
       _mc->EX_MEM._opResultHi = _mc->opRHi;
-       _mc->EX_MEM._opResultLo = _mc->opRLo;
+      _mc->EX_MEM._opResultLo = _mc->opRLo;
       _mc->EX_MEM._ins = ins;
       _mc->EX_MEM._memControl = memControl;
       _mc->EX_MEM._memOp = memOp;
@@ -158,5 +157,7 @@ Exe::MainLoop (void)
       _mc->EX_MEM._opControl=opControl;
       _mc->EX_MEM._btaken = btaken;
       _mc->EX_MEM._MAR = mar_;
+      _mc->EX_MEM.isstore = temp_isstore;
+      _mc->EX_MEM.src1reg = source1;
       }
 }

@@ -34,6 +34,7 @@ Mipc::Dec (unsigned int ins)
    load_lock = FALSE;
    toUpdateBranch = FALSE;
    isStore = FALSE;
+   ID_EX.isstore = FALSE;
 
    i.data = ins;
   
@@ -573,11 +574,13 @@ Mipc::Dec (unsigned int ins)
       ID_EX.src1reg = i.reg.rs;
       ID_EX._decodedSRC2 = i.imm.imm;
       ID_EX._decodedDST = i.reg.rt;
+      ID_EX.store_dest = i.reg.rt;
       ID_EX._writeREG = FALSE;
       ID_EX._writeFREG = FALSE;
       ID_EX._hiWPort = FALSE;
       ID_EX._loWPort = FALSE;
       ID_EX._memControl = TRUE;
+      ID_EX.isstore = TRUE;
       isStore = TRUE;
       break;
 
@@ -593,6 +596,7 @@ Mipc::Dec (unsigned int ins)
       ID_EX._hiWPort = FALSE;
       ID_EX._loWPort = FALSE;
       ID_EX._memControl = TRUE;
+      ID_EX.isstore = TRUE;
       isStore = TRUE;
 
       break;
@@ -609,6 +613,7 @@ Mipc::Dec (unsigned int ins)
       ID_EX._hiWPort = FALSE;
       ID_EX._loWPort = FALSE;
       ID_EX._memControl = TRUE;
+      ID_EX.isstore = TRUE;
       isStore = TRUE;
 
       break;
@@ -625,6 +630,7 @@ Mipc::Dec (unsigned int ins)
       ID_EX._hiWPort = FALSE;
       ID_EX._loWPort = FALSE;
       ID_EX._memControl = TRUE;
+      ID_EX.isstore = TRUE;
       isStore = TRUE;
 
       break;
@@ -641,6 +647,7 @@ Mipc::Dec (unsigned int ins)
       ID_EX._hiWPort = FALSE;
       ID_EX._loWPort = FALSE;
       ID_EX._memControl = TRUE;
+      ID_EX.isstore = TRUE;
       isStore = TRUE;
 
       break;
@@ -657,6 +664,7 @@ Mipc::Dec (unsigned int ins)
       ID_EX._hiWPort = FALSE;
       ID_EX._loWPort = FALSE;
       ID_EX._memControl = TRUE;
+      ID_EX.isstore = TRUE;
       isStore = TRUE;
 
       break;
@@ -715,10 +723,10 @@ Mipc::Dec (unsigned int ins)
    isStore2 = isStore1;
    isStore1 = isStore;
 
-// #ifdef MIPC_DEBUG
-//             // fprintf(_debugLog, "***subreg1 = %d *** subreg2 = %d ** %#x\n",ID_EX.src1reg,ID_EX.src2reg,currDST);
+#ifdef MIPC_DEBUG
+            fprintf(_debugLog, "***subreg1 = %d *** subreg2 = %d ** D1 = %d D2 = %d D3 = %d\n",ID_EX.src1reg,ID_EX.src2reg,currDST, prev1DST,prev2DST);
 
-// #endif
+#endif
 // #ifdef MIPC_DEBUG
 //             fprintf(_debugLog, " ********Current Load instruction status %d ** %d ** %d\n", currLoad,prev_isLoad);
 //             // fprintf(_debugLog, "<%llu> Previous Memory instruction status %#x\n", SIM_TIME, prevMEM);

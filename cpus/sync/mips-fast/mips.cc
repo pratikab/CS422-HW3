@@ -235,9 +235,10 @@ pipeline_reg::pipeline_reg(void){
    _btgt = 0xdeadbeef;            // branch target
     src1reg = 100;
     src2reg = 100;
+    store_dest = 100;
    _isSyscall = FALSE;       // 1 if system call
    _isIllegalOp = FALSE;        // 1 if illegal opcode
-
+   isstore = FALSE;
    _opControl = NULL;
 }
 pipeline_reg::~pipeline_reg(void){
@@ -263,8 +264,9 @@ pipeline_reg::reset(void){
    _btgt = 0xdeadbeef;            // branch target
     src1reg = 100;
     src2reg = 100;
+    store_dest = 100;
    _isSyscall = FALSE;       // 1 if system call
    _isIllegalOp = FALSE;        // 1 if illegal opcode
-
+   isstore = FALSE;
    _opControl = NULL;
 }

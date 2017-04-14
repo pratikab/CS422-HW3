@@ -31,7 +31,7 @@ class pipeline_reg{
 public:
       unsigned int _ins;   // instruction register
       signed int  _decodedSRC1, _decodedSRC2;   // Reg fetch output (source values)
-      int src1reg,src2reg;
+      int src1reg,src2reg,store_dest;
       unsigned _decodedDST;         // Decoder output (dest reg no)
       unsigned    _subregOperand;         // Needed for lwl and lwr
       unsigned _MAR;          // Memory address register
@@ -49,6 +49,7 @@ public:
       unsigned int   _btgt;            // branch target
       Bool     _isSyscall;       // 1 if system call
       Bool     _isIllegalOp;        // 1 if illegal opcode
+      Bool isstore;
       pipeline_reg();
       void reset();
       ~pipeline_reg();
