@@ -31,6 +31,7 @@ class pipeline_reg{
 public:
       unsigned int _ins;   // instruction register
       signed int  _decodedSRC1, _decodedSRC2;   // Reg fetch output (source values)
+      int src1reg,src2reg;
       unsigned _decodedDST;         // Decoder output (dest reg no)
       unsigned    _subregOperand;         // Needed for lwl and lwr
       unsigned _MAR;          // Memory address register
@@ -46,7 +47,6 @@ public:
       int      _btaken;          // taken branch (1 if taken, 0 if fall-through)
       int      _bd;           // 1 if the next ins is delay slot
       unsigned int   _btgt;            // branch target
-
       Bool     _isSyscall;       // 1 if system call
       Bool     _isIllegalOp;        // 1 if illegal opcode
       pipeline_reg();
@@ -87,7 +87,17 @@ public:
    unsigned int   _pc;           // Program counter
    unsigned int _boot;           // boot code loaded?
    bool system_call_in_pipe;
-   unsigned int   set_pc;           // Program counter
+   unsigned int   set_pc,set_pc_2,set_pc_3,set_ins;           // Program counter
+   Bool prev_isLoad;
+   Bool isLoad;
+   Bool load_lock;
+   Bool currMEM, prevMEM;
+   unsigned opRLo, opRHi, mar;
+   Bool toUpdateBranch;
+   unsigned int b_taken;
+
+
+   unsigned int prev1DST, prev2DST, currDST; 
 
    pipeline_reg IF_ID,ID_EX,EX_MEM,MEM_WB;
    // Simulation statistics counters

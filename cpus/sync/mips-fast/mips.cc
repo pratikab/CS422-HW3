@@ -31,7 +31,16 @@ Mipc::MainLoop (void)
 
    Assert (_boot, "Mipc::MainLoop() called without boot?");
     bool flag = TRUE;
+    prev_isLoad = FALSE;
+    isLoad = FALSE;
    _nfetched = 0;
+   load_lock = FALSE;
+   currMEM = FALSE;
+   prevMEM = FALSE;
+    prev1DST=1000; prev2DST = 1000; currDST= 1000; 
+    opRLo = 0; opRHi=0; b_taken = 0;
+    mar = 0;
+    toUpdateBranch = FALSE;
    while (!_sim_exit) {
     AWAIT_P_PHI0;
     AWAIT_P_PHI1;	// @posedge
@@ -48,6 +57,10 @@ Mipc::MainLoop (void)
       }
       IF_ID._pc = _pc;
     }
+    if(load_lock){
+      _pc = set_pc_3;
+      IF_ID._pc = _pc;
+    }
     addr = _pc;
     ins = _mem->BEGetWord (addr, _mem->Read(addr & ~(LL)0x7));
     if(system_call_in_pipe){
@@ -57,31 +70,8 @@ Mipc::MainLoop (void)
     _nfetched++;
     IF_ID._ins = ins;
     IF_ID._bd = 0;
-    #ifdef MIPC_DEBUG
+#ifdef MIPC_DEBUG
       fprintf(_debugLog, "<%llu> Fetched ins %#x from PC %#x\n", SIM_TIME, ins, IF_ID._pc);
-      // fprintf(_debugLog, "_ins = %d\n",_ins);
-      // fprintf(_debugLog, "_decodedSRC1 = %d\n",_decodedSRC1);
-      // fprintf(_debugLog, "_decodedSRC2 = %d\n",_decodedSRC2);
-      // fprintf(_debugLog, "_decodedDST = %d\n",_decodedDST);
-      // fprintf(_debugLog, "_subregOperand = %d\n",_subregOperand);
-      // fprintf(_debugLog, "_MAR = %d\n",_MAR);
-      // fprintf(_debugLog, "_opResultHi = %d\n",_opResultHi);
-      // fprintf(_debugLog, "_opResultLo = %d\n",_opResultLo);
-      // fprintf(_debugLog, "_memControl = %d\n",_memControl);
-      // fprintf(_debugLog, "_writeREG = %d\n",_writeREG);
-      // fprintf(_debugLog, "_writeFREG = %d\n",_writeFREG);
-      // fprintf(_debugLog, "_branchOffset = %d\n",_branchOffset);
-      // fprintf(_debugLog, "_hiWPort = %d\n",_hiWPort);
-      // fprintf(_debugLog, "_loWPort = %d\n",_loWPort);
-      // fprintf(_debugLog, "_decodedShiftAmt = %d\n",_decodedShiftAmt);
-      // fprintf(_debugLog, "_hi = %d\n",_hi);
-      // fprintf(_debugLog, "_lo = %d\n",_lo);
-      // fprintf(_debugLog, "_lastbd = %d\n",_lastbd);
-      // fprintf(_debugLog, "_btaken = %d\n",_btaken);
-      // fprintf(_debugLog, "_bd = %d\n",_bd);
-      // fprintf(_debugLog, "_btgt = %d\n",_btgt);
-      // fprintf(_debugLog, "_isSyscall = %d\n",_isSyscall);
-      // fprintf(_debugLog, "_isIllegalOp = %d\n",_isIllegalOp);
 #endif
    }
 
@@ -239,7 +229,8 @@ pipeline_reg::pipeline_reg(void){
    _btaken = 0;          // taken branch (1 if taken, 0 if fall-through)
    _bd = 0;           // 1 if the next ins is delay slot
    _btgt = 0xdeadbeef;            // branch target
-
+    src1reg = 100;
+    src2reg = 100;
    _isSyscall = FALSE;       // 1 if system call
    _isIllegalOp = FALSE;        // 1 if illegal opcode
 
@@ -266,7 +257,8 @@ pipeline_reg::reset(void){
    _btaken = 0;          // taken branch (1 if taken, 0 if fall-through)
    _bd = 0;           // 1 if the next ins is delay slot
    _btgt = 0xdeadbeef;            // branch target
-
+    src1reg = 100;
+    src2reg = 100;
    _isSyscall = FALSE;       // 1 if system call
    _isIllegalOp = FALSE;        // 1 if illegal opcode
 

@@ -43,29 +43,6 @@ Memory::MainLoop (void)
 
 #ifdef MIPC_DEBUG
             fprintf(_mc->_debugLog, "<%llu> Accessing memory at address %#x for ins %#x\n", SIM_TIME, _mc->EX_MEM._MAR, ins);
-            // fprintf(_mc->_debugLog, "_ins = %d\n",_mc->EX_MEM._ins);
-            // fprintf(_mc->_debugLog, "_decodedSRC1 = %d\n",_mc->EX_MEM._decodedSRC1);
-            // fprintf(_mc->_debugLog, "_decodedSRC2 = %d\n",_mc->EX_MEM._decodedSRC2);
-            // fprintf(_mc->_debugLog, "_decodedDST = %d\n",_mc->EX_MEM._decodedDST);
-            // fprintf(_mc->_debugLog, "_subregOperand = %d\n",_mc->EX_MEM._subregOperand);
-            // fprintf(_mc->_debugLog, "_MAR = %d\n",_mc->EX_MEM._MAR);
-            // fprintf(_mc->_debugLog, "_opResultHi = %d\n",_mc->EX_MEM._opResultHi);
-            // fprintf(_mc->_debugLog, "_opResultLo = %d\n",_mc->EX_MEM._opResultLo);
-            // fprintf(_mc->_debugLog, "_memControl = %d\n",_mc->EX_MEM._memControl);
-            // fprintf(_mc->_debugLog, "_writeREG = %d\n",_mc->EX_MEM._writeREG);
-            // fprintf(_mc->_debugLog, "_writeFREG = %d\n",_mc->EX_MEM._writeFREG);
-            // fprintf(_mc->_debugLog, "_branchOffset = %d\n",_mc->EX_MEM._branchOffset);
-            // fprintf(_mc->_debugLog, "_hiWPort = %d\n",_mc->EX_MEM._hiWPort);
-            // fprintf(_mc->_debugLog, "_loWPort = %d\n",_mc->EX_MEM._loWPort);
-            // fprintf(_mc->_debugLog, "_decodedShiftAmt = %d\n",_mc->EX_MEM._decodedShiftAmt);
-            // fprintf(_mc->_debugLog, "_hi = %d\n",_mc->EX_MEM._hi);
-            // fprintf(_mc->_debugLog, "_lo = %d\n",_mc->EX_MEM._lo);
-            // fprintf(_mc->_debugLog, "_lastbd = %d\n",_mc->EX_MEM._lastbd);
-            // fprintf(_mc->_debugLog, "_btaken = %d\n",_mc->EX_MEM._btaken);
-            // fprintf(_mc->_debugLog, "_bd = %d\n",_mc->EX_MEM._bd);
-            // fprintf(_mc->_debugLog, "_btgt = %d\n",_mc->EX_MEM._btgt);
-            // fprintf(_mc->_debugLog, "_isSyscall = %d\n",isSyscall);
-            // fprintf(_mc->_debugLog, "_isIllegalOp = %d\n",_mc->EX_MEM._isIllegalOp);
 #endif
          }
          else {

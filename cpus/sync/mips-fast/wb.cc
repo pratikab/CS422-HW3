@@ -44,7 +44,6 @@ Writeback::MainLoop (void)
             opControl(_mc, ins);
             _mc->set_pc  = pc + 4;
             _mc->system_call_in_pipe = FALSE;
-
          }
          else if (isIllegalOp) {
             printf("Illegal ins %#x at PC %#x. Terminating simulation!\n", ins, pc);
