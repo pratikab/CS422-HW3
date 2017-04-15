@@ -18,7 +18,7 @@ Memory::MainLoop (void)
    Bool hiWPort;
    Bool isSyscall;
    Bool isIllegalOp;
-    Bool flag;
+    Bool flag,temp_cl;
    unsigned decodedDST;
    unsigned opResultLo, opResultHi;
    unsigned temp_prev1DST;
@@ -50,23 +50,26 @@ Memory::MainLoop (void)
          memOp = _mc->EX_MEM._memOp;
          temp_prev1DST = _mc->prev2DST;
          unsigned temp =  _mc->_gpr[_mc->tempDecodedDST];
+          temp_cl = _mc->EX_MEM.cl;
          _mc->MEMPATH = 0;
          _mc->MEMPATH_check = FALSE;
 
 
          flag = FALSE;
          AWAIT_P_PHI1;  // @negedge   
-//          if(temp_isstore){
-//             if(_mc->tempDecodedDST == temp_prev1DST){
-//                _mc->MEMPATH = temp_memwb;
-//                _mc->MEMPATH_check = TRUE;
-//                // _mc->_gpr[_mc->tempDecodedDST] = temp_memwb;
-//                flag = TRUE;
-// #ifdef MIPC_DEBUG
-//             fprintf(_mc->_debugLog, "MEM-MEM bypass(%#x) %d to %d \n",temp_memwb ,_mc->tempDecodedDST, temp_prev1DST);
-// #endif  
-//             }
-//          }
+         if(temp_isstore){
+            if(temp_cl){
+               if(_mc->tempDecodedDST == temp_prev1DST){
+                  _mc->MEMPATH = temp_memwb;
+                  _mc->MEMPATH_check = TRUE;
+                  // _mc->_gpr[_mc->tempDecodedDST] = temp_memwb;
+                  flag = TRUE;
+   #ifdef MIPC_DEBUG
+               fprintf(_mc->_debugLog, "MEM-MEM bypass(%#x) %d to %d \n",temp_memwb ,_mc->tempDecodedDST, temp_prev1DST);
+   #endif  
+               }
+            }
+         }
 
          if (memControl) {
              memOp(_mc);

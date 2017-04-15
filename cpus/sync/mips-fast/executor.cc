@@ -23,7 +23,7 @@ Exe::MainLoop (void)
    void (*memOp)(Mipc*);
    int source1, source2;
    unsigned mar_;
-   bool temp_isstore;
+   bool temp_isstore,temp_cl;;
 
    while (1) {
       AWAIT_P_PHI0;	// @posedge
@@ -43,31 +43,12 @@ Exe::MainLoop (void)
          temp_isstore = _mc->ID_EX.isstore;
          _mc->b_taken = 0;
          _mc->temppc_ = pc;
-
+         temp_cl = _mc->ID_EX.cl;
          source1 = _mc->ID_EX.src1reg;
          source2 = _mc->ID_EX.src2reg; 
 
-         bool flag = FALSE;
-         if(!_mc->prevMEM ){
-            if(source1 == _mc->prev1DST && source1 != 0){
-               flag = TRUE;
-               _mc->ID_EX._decodedSRC1 = _mc->EX_MEM._opResultLo;
-               if(_mc->toUpdateBranch){
-                   _mc->ID_EX._btgt = _mc->ID_EX._decodedSRC1;
-               }
-#ifdef MIPC_DEBUG
-            fprintf(_mc->_debugLog, "EX-EX bypass(%#x) from %d to %d\n", _mc->EX_MEM._opResultLo, _mc->prev1DST,source1);
-#endif            
-            }
-            else if(source2 == _mc->prev1DST && source2 != 0){
-               flag = TRUE;
-               _mc->ID_EX._decodedSRC2 = _mc->EX_MEM._opResultLo;
-#ifdef MIPC_DEBUG
-            fprintf(_mc->_debugLog, "EX-EX bypass(%#x) from %d to %d\n", _mc->EX_MEM._opResultLo,_mc->prev1DST,source2);
-#endif
-            }  
-         }
-         if(!_mc->isStore3 && !flag){
+         
+         if(!_mc->isStore3){
             if(source1 == _mc->prev2DST && source1 != 0){
                _mc->ID_EX._decodedSRC1 = _mc->MEM_WB._opResultLo;
                if(_mc->toUpdateBranch){
@@ -83,7 +64,29 @@ Exe::MainLoop (void)
 //             fprintf(_mc->_debugLog, "MEM-EX bypass(%#x) from %d to %d\n",_mc->MEM_WB._opResultLo,_mc->prev2DST,source2);
 // #endif
             }  
-         }        
+         }
+         if(!_mc->prevMEM ){
+            if(source1 == _mc->prev1DST && source1 != 0){
+               _mc->ID_EX._decodedSRC1 = _mc->EX_MEM._opResultLo;
+               if(_mc->toUpdateBranch){
+                   _mc->ID_EX._btgt = _mc->ID_EX._decodedSRC1;
+               }
+// #ifdef MIPC_DEBUG
+//             fprintf(_mc->_debugLog, "EX-EX bypass(%#x) from %d to %d\n", _mc->EX_MEM._opResultLo, _mc->prev1DST,source1);
+// #endif            
+            }
+            else if(source2 == _mc->prev1DST && source2 != 0){
+               _mc->ID_EX._decodedSRC2 = _mc->EX_MEM._opResultLo;
+// #ifdef MIPC_DEBUG
+//             fprintf(_mc->_debugLog, "EX-EX bypass(%#x) from %d to %d\n", _mc->EX_MEM._opResultLo,_mc->prev1DST,source2);
+// #endif
+            }  
+         } 
+#ifdef MIPC_DEBUG
+            fprintf(_mc->
+               _debugLog, "***SRC1 = %#x SRC2 = %#x\n",_mc->ID_EX._decodedSRC1,_mc->ID_EX._decodedSRC2);
+
+#endif       
          if (!isSyscall && !isIllegalOp) {
             if (_mc->ID_EX._opControl != NULL)
                _mc->ID_EX._opControl(_mc,ins);
@@ -142,5 +145,6 @@ Exe::MainLoop (void)
       _mc->EX_MEM._MAR = mar_;
       _mc->EX_MEM.isstore = temp_isstore;
       _mc->EX_MEM.src1reg = source1;
+      _mc->EX_MEM.cl = temp_cl ;
       }
 }

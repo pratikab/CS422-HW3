@@ -721,6 +721,7 @@ Mipc::Dec (unsigned int ins)
    currDST = ID_EX._decodedDST;
    prev_isLoad = currLoad; 
    currLoad = isLoad;
+   ID_EX.cl = isLoad;
    prevMEM = currMEM;
    currMEM = ID_EX._memControl;
    isStore3 = isStore2;
@@ -750,10 +751,10 @@ Mipc::Dec (unsigned int ins)
 //             fprintf(_debugLog, "***subreg1 = %d *** subreg2 = %d ** D1 = %d D2 = %d D3 = %d\n",ID_EX.src1reg,ID_EX.src2reg,currDST, prev1DST,prev2DST);
 
 // #endif
-#ifdef MIPC_DEBUG
-            fprintf(_debugLog, "***SRC1 = %#x SRC2 = %#x , reg1 = %d, reg2 = %d\n",ID_EX._decodedSRC1,ID_EX._decodedSRC2,ID_EX.src1reg,ID_EX.src2reg);
+// #ifdef MIPC_DEBUG
+//             fprintf(_debugLog, "***SRC1 = %#x SRC2 = %#x , reg1 = %d, reg2 = %d\n",ID_EX._decodedSRC1,ID_EX._decodedSRC2,ID_EX.src1reg,ID_EX.src2reg);
 
-#endif
+// #endif
 // #ifdef MIPC_DEBUG
 //             fprintf(_debugLog, " ********Current Load instruction status %d ** %d ** %d\n", currLoad,prev_isLoad);
 //             // fprintf(_debugLog, "<%llu> Previous Memory instruction status %#x\n", SIM_TIME, prevMEM);

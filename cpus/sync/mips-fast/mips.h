@@ -48,7 +48,7 @@ public:
       int      _bd;           // 1 if the next ins is delay slot
       unsigned int   _btgt;            // branch target
       Bool     _isSyscall;       // 1 if system call
-      Bool     _isIllegalOp;        // 1 if illegal opcode
+      Bool     _isIllegalOp,cl;        // 1 if illegal opcode
       Bool isstore;
       pipeline_reg();
       void reset();

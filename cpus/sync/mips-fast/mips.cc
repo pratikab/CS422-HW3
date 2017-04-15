@@ -242,6 +242,7 @@ pipeline_reg::pipeline_reg(void){
    _isIllegalOp = FALSE;        // 1 if illegal opcode
    isstore = FALSE;
    _opControl = NULL;
+   cl = FALSE;
 }
 pipeline_reg::~pipeline_reg(void){
 }
@@ -271,4 +272,5 @@ pipeline_reg::reset(void){
    _isIllegalOp = FALSE;        // 1 if illegal opcode
    isstore = FALSE;
    _opControl = NULL;
+   cl = FALSE;
 }
