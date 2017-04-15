@@ -1166,6 +1166,7 @@ Mipc::func_lw (Mipc *mc, unsigned ins)
    mc->_num_load++;
    SIGN_EXTEND_IMM(mc->ID_EX._decodedSRC2);
    mc->mar = (unsigned)(mc->ID_EX._decodedSRC1+mc->ID_EX._decodedSRC2);
+
 }
 
 void
@@ -1309,6 +1310,9 @@ Mipc::mem_lw (Mipc *mc)
 {
    mc->MEM_WB._opResultLo = mc->_mem->BEGetWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7));
       mc->flag_toChangeOpresult = TRUE;
+#ifdef MIPC_DEBUG
+            fprintf(mc->_debugLog, "INSIDE LOAD.. OUTPUT = %#x\n",mc->MEM_WB._opResultLo);
+#endif
 }
 
 void
@@ -1363,6 +1367,9 @@ Mipc::mem_swl (Mipc *mc)
 void
 Mipc::mem_sw (Mipc *mc)
 {
+#ifdef MIPC_DEBUG
+            fprintf(mc->_debugLog, "INSIDE STORE.. OUTPUT = %#x\n",mc->_gpr[mc->tempDecodedDST]);
+#endif
    mc->_mem->Write(mc->tempMAR & ~(LL)0x7, mc->_mem->BESetWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7), mc->_gpr[mc->tempDecodedDST]));
 }
 

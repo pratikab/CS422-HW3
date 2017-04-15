@@ -21,6 +21,7 @@ Memory::MainLoop (void)
     Bool flag;
    unsigned decodedDST;
    unsigned opResultLo, opResultHi;
+   unsigned temp_prev1DST;
    void (*opControl)(Mipc*, unsigned);
       bool temp_isstore, temp_memwb;
          void (*memOp)(Mipc*);
@@ -47,16 +48,16 @@ Memory::MainLoop (void)
          temp_isstore = _mc->EX_MEM.isstore;
          temp_memwb =  _mc->MEM_WB._opResultLo;
          memOp = _mc->EX_MEM._memOp;
-
+         temp_prev1DST = _mc->prev2DST;
          unsigned temp =  _mc->_gpr[_mc->tempDecodedDST];
          flag = FALSE;
          AWAIT_P_PHI1;  // @negedge   
          if(temp_isstore){
-            if(_mc->tempDecodedDST == _mc->prev1DST){
+            if(_mc->tempDecodedDST == temp_prev1DST){
                _mc->_gpr[_mc->tempDecodedDST] = temp_memwb;
                flag = TRUE;
 #ifdef MIPC_DEBUG
-            fprintf(_mc->_debugLog, "MEM-MEM bypass %d to %d\n",_mc->tempDecodedDST, _mc->prev1DST);
+            fprintf(_mc->_debugLog, "MEM-MEM bypass %d to %d\n",_mc->tempDecodedDST, temp_prev1DST);
 #endif  
             }
          }
