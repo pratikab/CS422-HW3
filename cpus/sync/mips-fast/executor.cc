@@ -54,6 +54,7 @@ Exe::MainLoop (void)
                if(_mc->toUpdateBranch){
                    _mc->ID_EX._btgt = _mc->ID_EX._decodedSRC1;
                }
+               _mc->memexcount++;
 // #ifdef MIPC_DEBUG
 //             fprintf(_mc->_debugLog, "MEM-EX bypass(%#x) from %d to %d\n",_mc->MEM_WB._opResultLo, _mc->prev2DST,source1);
 // #endif            
@@ -63,6 +64,7 @@ Exe::MainLoop (void)
 // #ifdef MIPC_DEBUG
 //             fprintf(_mc->_debugLog, "MEM-EX bypass(%#x) from %d to %d\n",_mc->MEM_WB._opResultLo,_mc->prev2DST,source2);
 // #endif
+               _mc->memexcount++;
             }  
          }
          if(!_mc->prevMEM ){
@@ -71,12 +73,14 @@ Exe::MainLoop (void)
                if(_mc->toUpdateBranch){
                    _mc->ID_EX._btgt = _mc->ID_EX._decodedSRC1;
                }
+               _mc->exexcount++;
 // #ifdef MIPC_DEBUG
 //             fprintf(_mc->_debugLog, "EX-EX bypass(%#x) from %d to %d\n", _mc->EX_MEM._opResultLo, _mc->prev1DST,source1);
 // #endif            
             }
             else if(source2 == _mc->prev1DST && source2 != 0){
                _mc->ID_EX._decodedSRC2 = _mc->EX_MEM._opResultLo;
+               _mc->exexcount++;
 // #ifdef MIPC_DEBUG
 //             fprintf(_mc->_debugLog, "EX-EX bypass(%#x) from %d to %d\n", _mc->EX_MEM._opResultLo,_mc->prev1DST,source2);
 // #endif

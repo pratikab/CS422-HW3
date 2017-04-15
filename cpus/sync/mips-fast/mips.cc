@@ -37,6 +37,9 @@ Mipc::MainLoop (void)
     currLoad = FALSE;
     isLoad = FALSE;
    _nfetched = 0;
+   exexcount = 0;
+   memexcount = 0;
+   memmemcount = 0;
    load_lock = FALSE;
    currMEM = FALSE;
    prevMEM = FALSE;
@@ -83,7 +86,6 @@ Mipc::MainLoop (void)
 
    MipcDumpstats();
    Log::CloseLog();
-   
 #ifdef MIPC_DEBUG
    assert(_debugLog != NULL);
    fclose(_debugLog);
@@ -97,7 +99,7 @@ Mipc::MipcDumpstats()
 {
   Log l('*');
   l.startLogging = 0;
-
+  _nfetched = _nfetched - 1; // after end syscall it fetches one instruction
   l.print ("");
   l.print ("************************************************************");
   l.print ("");
@@ -112,6 +114,9 @@ Mipc::MipcDumpstats()
   l.print ("Number of syscall emulated loads: %llu", _sys->_num_load);
   l.print ("Number of stores: %llu", _num_store);
   l.print ("Number of syscall emulated stores: %llu", _sys->_num_store);
+  l.print ("Number of EX-EX Bypass: %llu", exexcount);
+  l.print ("Number of MEM-EX Bypass: %llu", memexcount);
+  l.print ("Number of MEM-MEM Bypass: %llu", memmemcount);
   l.print ("");
 
 }

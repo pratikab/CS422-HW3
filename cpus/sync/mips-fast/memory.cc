@@ -49,7 +49,6 @@ Memory::MainLoop (void)
          temp_memwb =  _mc->MEM_WB._opResultLo;
          memOp = _mc->EX_MEM._memOp;
          temp_prev1DST = _mc->prev2DST;
-         unsigned temp =  _mc->_gpr[_mc->tempDecodedDST];
           temp_cl = _mc->EX_MEM.cl;
          _mc->MEMPATH = 0;
          _mc->MEMPATH_check = FALSE;
@@ -62,8 +61,8 @@ Memory::MainLoop (void)
                if(_mc->tempDecodedDST == temp_prev1DST){
                   _mc->MEMPATH = temp_memwb;
                   _mc->MEMPATH_check = TRUE;
-                  // _mc->_gpr[_mc->tempDecodedDST] = temp_memwb;
                   flag = TRUE;
+                  _mc->memmemcount++;
    #ifdef MIPC_DEBUG
                fprintf(_mc->_debugLog, "MEM-MEM bypass(%#x) %d to %d \n",temp_memwb ,_mc->tempDecodedDST, temp_prev1DST);
    #endif  
@@ -99,8 +98,5 @@ Memory::MainLoop (void)
       _mc->MEM_WB._isSyscall=isSyscall;
       _mc->MEM_WB._isIllegalOp=isIllegalOp;
       _mc->MEM_WB._opControl=opControl;
-      // if (flag){
-      //    _mc->_gpr[_mc->tempDecodedDST] = temp;
-      // }
    }
 }

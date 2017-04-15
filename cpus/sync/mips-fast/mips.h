@@ -107,6 +107,7 @@ public:
    pipeline_reg IF_ID,ID_EX,EX_MEM,MEM_WB;
    // Simulation statistics counters
    LL	_nfetched;
+   LL exexcount,memexcount,memmemcount;
    LL	_num_cond_br;
    LL	_num_jal;
    LL	_num_jr;
