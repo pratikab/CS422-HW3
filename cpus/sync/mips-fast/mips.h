@@ -98,7 +98,7 @@ public:
    unsigned int b_taken;
    unsigned tempMAR,tempSubregOperand,tempDecodedDST;
 
-   unsigned int prev1DST, prev2DST, currDST; 
+   unsigned int prev1DST, prev2DST, currDST,temppc,temppc_; 
    Bool isStore,isStore1,isStore2,isStore3;
    Bool flag_toChangeOpresult;
 

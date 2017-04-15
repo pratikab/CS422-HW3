@@ -49,6 +49,7 @@ Exe::MainLoop (void)
          bd =_mc->ID_EX._bd;
          temp_isstore = _mc->ID_EX.isstore;
          _mc->b_taken = 0;
+         _mc->temppc_ = pc;
 
          source1 = _mc->ID_EX.src1reg;
          source2 = _mc->ID_EX.src2reg;           
@@ -129,7 +130,7 @@ Exe::MainLoop (void)
          if (!isIllegalOp && !isSyscall) {
             if(!_mc->system_call_in_pipe){  
                if (btaken)
-               {
+               {              
                   _mc->_pc = btgt;
                }
                else

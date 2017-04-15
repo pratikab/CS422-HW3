@@ -15,6 +15,8 @@ Mipc::Mipc (Mem *m) : _l('M')
    
   Reboot (ParamGetString ("Mipc.BootROM"));
   set_pc = _pc;
+  temppc = _pc;
+  temppc_ = _pc;
 
 }
 

@@ -21,7 +21,8 @@ Decode::MainLoop (void)
             ins = _mc->IF_ID._ins;
             pc =  _mc->IF_ID._pc;
       }
-      AWAIT_P_PHI1;	// @negedge
+      AWAIT_P_PHI1;
+            _mc->temppc = pc;
             _mc->Dec(ins);
 
       _mc->ID_EX._pc = pc;

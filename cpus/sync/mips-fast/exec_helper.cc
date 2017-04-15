@@ -304,6 +304,7 @@ Mipc::Dec (unsigned int ins)
       ID_EX._decodedSRC1 = _gpr[i.imm.rs];
       ID_EX.src1reg = i.imm.rs;
       ID_EX._decodedSRC2 = _gpr[i.imm.rt];
+      ID_EX.src2reg = i.imm.rt;
       ID_EX._branchOffset = i.imm.imm;
       ID_EX._writeREG = FALSE;
       ID_EX._writeFREG = FALSE;
@@ -313,7 +314,7 @@ Mipc::Dec (unsigned int ins)
       ID_EX._branchOffset <<= 16; 
       ID_EX._branchOffset >>= 14; 
       ID_EX._bd = 1;
-      ID_EX._btgt = (unsigned)((signed)_pc+ID_EX._branchOffset+4);
+      ID_EX._btgt = (unsigned)((signed)temppc+ID_EX._branchOffset+4); 
       break;
 
    case 1:
@@ -333,7 +334,7 @@ Mipc::Dec (unsigned int ins)
          ID_EX._branchOffset <<= 16;
          ID_EX._branchOffset >>= 14;
          ID_EX._bd = 1;
-         ID_EX._btgt = (unsigned)((signed)_pc+ID_EX._branchOffset+4);
+         ID_EX._btgt = (unsigned)((signed)temppc+ID_EX._branchOffset+4);
 	 break;
 
       case 0x11:			// bgezal
@@ -343,7 +344,7 @@ Mipc::Dec (unsigned int ins)
          ID_EX._branchOffset <<= 16;
          ID_EX._branchOffset >>= 14;
          ID_EX._bd = 1;
-         ID_EX._btgt = (unsigned)((signed)_pc+ID_EX._branchOffset+4);
+         ID_EX._btgt = (unsigned)((signed)temppc+ID_EX._branchOffset+4);
 	 break;
 
       case 0x10:			// bltzal
@@ -353,7 +354,7 @@ Mipc::Dec (unsigned int ins)
          ID_EX._branchOffset <<= 16;
          ID_EX._branchOffset >>= 14;
          ID_EX._bd = 1;
-         ID_EX._btgt = (unsigned)((signed)_pc+ID_EX._branchOffset+4);
+         ID_EX._btgt = (unsigned)((signed)temppc+ID_EX._branchOffset+4);
 	 break;
 
       case 0x0:			// bltz
@@ -361,7 +362,7 @@ Mipc::Dec (unsigned int ins)
          ID_EX._branchOffset <<= 16;
          ID_EX._branchOffset >>= 14;
          ID_EX._bd = 1;
-         ID_EX._btgt = (unsigned)((signed)_pc+ID_EX._branchOffset+4);
+         ID_EX._btgt = (unsigned)((signed)temppc+ID_EX._branchOffset+4);
 	 break;
 
       default:
@@ -383,7 +384,7 @@ Mipc::Dec (unsigned int ins)
       ID_EX._branchOffset <<= 16;
       ID_EX._branchOffset >>= 14;
       ID_EX._bd = 1;
-      ID_EX._btgt = (unsigned)((signed)_pc+ID_EX._branchOffset+4);
+      ID_EX._btgt = (unsigned)((signed)temppc+ID_EX._branchOffset+4);
       break;
 
    case 6:			// blez
@@ -399,7 +400,7 @@ Mipc::Dec (unsigned int ins)
       ID_EX._branchOffset <<= 16;
       ID_EX._branchOffset >>= 14;
       ID_EX._bd = 1;
-      ID_EX._btgt = (unsigned)((signed)_pc+ID_EX._branchOffset+4);
+      ID_EX._btgt = (unsigned)((signed)temppc+ID_EX._branchOffset+4);
       break;
 
    case 5:			// bne
@@ -417,7 +418,7 @@ Mipc::Dec (unsigned int ins)
       ID_EX._branchOffset <<= 16;
       ID_EX._branchOffset >>= 14;
       ID_EX._bd = 1;
-      ID_EX._btgt = (unsigned)((signed)_pc+ID_EX._branchOffset+4);
+      ID_EX._btgt = (unsigned)((signed)temppc+ID_EX._branchOffset+4);
       break;
 
    case 2:			// j
@@ -428,7 +429,7 @@ Mipc::Dec (unsigned int ins)
       ID_EX._hiWPort = FALSE;
       ID_EX._loWPort = FALSE;
       ID_EX._memControl = FALSE;
-      ID_EX._btgt = ((_pc+4) & 0xf0000000) | (ID_EX._branchOffset<<2);
+      ID_EX._btgt = ((temppc+4) & 0xf0000000) | (ID_EX._branchOffset<<2);
       ID_EX._bd = 1;
       break;
 
@@ -441,7 +442,7 @@ Mipc::Dec (unsigned int ins)
       ID_EX._hiWPort = FALSE;
       ID_EX._loWPort = FALSE;
       ID_EX._memControl = FALSE;
-      ID_EX._btgt = ((_pc+4) & 0xf0000000) | (ID_EX._branchOffset<<2);
+      ID_EX._btgt = ((temppc+4) & 0xf0000000) | (ID_EX._branchOffset<<2);
       ID_EX._bd = 1;
       break;
 
@@ -723,8 +724,12 @@ Mipc::Dec (unsigned int ins)
    isStore2 = isStore1;
    isStore1 = isStore;
 
+// #ifdef MIPC_DEBUG
+//             fprintf(_debugLog, "***subreg1 = %d *** subreg2 = %d ** D1 = %d D2 = %d D3 = %d\n",ID_EX.src1reg,ID_EX.src2reg,currDST, prev1DST,prev2DST);
+
+// #endif
 #ifdef MIPC_DEBUG
-            fprintf(_debugLog, "***subreg1 = %d *** subreg2 = %d ** D1 = %d D2 = %d D3 = %d\n",ID_EX.src1reg,ID_EX.src2reg,currDST, prev1DST,prev2DST);
+            fprintf(_debugLog, "***SRC1 = %#x SRC2 = %#x , reg1 = %d, reg2 = %d\n",ID_EX._decodedSRC1,ID_EX._decodedSRC2,ID_EX.src1reg,ID_EX.src2reg);
 
 #endif
 // #ifdef MIPC_DEBUG
@@ -960,7 +965,7 @@ Mipc::func_jalr (Mipc *mc, unsigned ins)
 {
    mc->b_taken = 1;
    mc->_num_jal++;
-   mc->opRLo = mc->_pc + 8;
+   mc->opRLo = mc->temppc_ + 8;
 }
 
 void
@@ -1055,7 +1060,7 @@ Mipc::func_bgezal (Mipc *mc, unsigned ins)
 {
    mc->_num_cond_br++;
    mc->b_taken = !(mc->ID_EX._decodedSRC1 >> 31);
-   mc->opRLo = mc->_pc + 8;
+   mc->opRLo = mc->temppc_ + 8;
 }
 
 void
@@ -1063,7 +1068,7 @@ Mipc::func_bltzal (Mipc *mc, unsigned ins)
 {
    mc->_num_cond_br++;
    mc->b_taken = (mc->ID_EX._decodedSRC1 >> 31);
-   mc->opRLo = mc->_pc + 8;
+   mc->opRLo = mc->temppc_ + 8;
 }
 
 void
@@ -1105,7 +1110,7 @@ Mipc::func_jal (Mipc *mc, unsigned ins)
 {
    	mc->_num_jal++;
 	  mc->b_taken = 1;
-      mc->opRLo = mc->_pc + 8;
+      mc->opRLo = mc->temppc_ + 8;
 }
 
 void
