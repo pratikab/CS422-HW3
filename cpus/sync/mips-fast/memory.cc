@@ -22,7 +22,9 @@ Memory::MainLoop (void)
    unsigned decodedDST;
    unsigned opResultLo, opResultHi;
    void (*opControl)(Mipc*, unsigned);
-      bool temp_isstore, temp_memwb;;
+      bool temp_isstore, temp_memwb;
+         void (*memOp)(Mipc*);
+
    while (1) {
       AWAIT_P_PHI0;       // @posedge
          _mc->flag_toChangeOpresult = FALSE;
@@ -44,6 +46,8 @@ Memory::MainLoop (void)
          _mc->tempDecodedDST =_mc->EX_MEM._decodedDST;
          temp_isstore = _mc->EX_MEM.isstore;
          temp_memwb =  _mc->MEM_WB._opResultLo;
+         memOp = _mc->EX_MEM._memOp;
+
          unsigned temp =  _mc->_gpr[_mc->tempDecodedDST];
          flag = FALSE;
          AWAIT_P_PHI1;  // @negedge   
@@ -58,7 +62,7 @@ Memory::MainLoop (void)
          }
 
          if (memControl) {
-            _mc->EX_MEM._memOp(_mc);
+             memOp(_mc);
 
 #ifdef MIPC_DEBUG
             fprintf(_mc->_debugLog, "<%llu> Accessing memory at address %#x for ins %#x\n", SIM_TIME, _mc->tempMAR, ins);
