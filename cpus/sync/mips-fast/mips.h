@@ -97,6 +97,8 @@ public:
    Bool toUpdateBranch;
    unsigned int b_taken;
    unsigned tempMAR,tempSubregOperand,tempDecodedDST;
+   unsigned MEMPATH;
+   Bool MEMPATH_check;
 
    unsigned int prev1DST, prev2DST, currDST,temppc,temppc_; 
    Bool isStore,isStore1,isStore2,isStore3;

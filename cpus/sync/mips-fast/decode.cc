@@ -13,14 +13,8 @@ Decode::MainLoop (void)
    unsigned int ins,pc;
    while (1) {
       AWAIT_P_PHI0;	// @posedge
-      if (_mc->load_lock){
-            ins = _mc->set_ins;
-            pc = _mc->set_pc_2;
-      }
-      else{
             ins = _mc->IF_ID._ins;
             pc =  _mc->IF_ID._pc;
-      }
       AWAIT_P_PHI1;
             _mc->temppc = pc;
             _mc->Dec(ins);

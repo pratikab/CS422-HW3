@@ -419,6 +419,7 @@ Mipc::Dec (unsigned int ins)
       ID_EX._branchOffset >>= 14;
       ID_EX._bd = 1;
       ID_EX._btgt = (unsigned)((signed)temppc+ID_EX._branchOffset+4);
+
       break;
 
    case 2:			// j
@@ -676,6 +677,7 @@ Mipc::Dec (unsigned int ins)
       case 4:			// mtc1
          ID_EX._opControl = func_mtc1;
          ID_EX._decodedSRC1 = _gpr[i.freg.ft];
+         ID_EX.src1reg = i.freg.ft;
          ID_EX._decodedDST = i.freg.fs;
          ID_EX._writeREG = FALSE;
          ID_EX._writeFREG = TRUE;
@@ -723,6 +725,25 @@ Mipc::Dec (unsigned int ins)
    isStore3 = isStore2;
    isStore2 = isStore1;
    isStore1 = isStore;
+   if(prev_isLoad){
+      if(ID_EX.src1reg == prev1DST){
+#ifdef MIPC_DEBUG
+            fprintf(_debugLog, "LOAD INTERLOCK\n");
+#endif
+         ID_EX.reset();
+         IF_ID.reset();
+         set_pc_3 = IF_ID._pc;
+      }
+      else if(ID_EX.src2reg == prev1DST){
+#ifdef MIPC_DEBUG
+            fprintf(_debugLog, "LOAD INTERLOCK\n");
+#endif 
+         ID_EX.reset();
+         IF_ID.reset();
+         set_pc_3 = IF_ID._pc;
+      }
+   }
+
 
 // #ifdef MIPC_DEBUG
 //             fprintf(_debugLog, "***subreg1 = %d *** subreg2 = %d ** D1 = %d D2 = %d D3 = %d\n",ID_EX.src1reg,ID_EX.src2reg,currDST, prev1DST,prev2DST);
@@ -973,6 +994,7 @@ Mipc::func_jr (Mipc *mc, unsigned ins)
 {
    mc->b_taken = 1;
    mc->_num_jr++;
+
 }
 
 void
@@ -1338,19 +1360,35 @@ Mipc::mem_lwc1 (Mipc *mc)
 void
 Mipc::mem_swc1 (Mipc *mc)
 {
-   mc->_mem->Write(mc->tempMAR & ~(LL)0x7, mc->_mem->BESetWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7), mc->_fpr[mc->tempDecodedDST>>1].l[FP_TWIDDLE^(mc->tempDecodedDST&1)]));
+   if(mc->MEMPATH_check){
+      mc->_mem->Write(mc->tempMAR & ~(LL)0x7, mc->_mem->BESetWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7), mc->_fpr[mc->tempDecodedDST>>1].l[FP_TWIDDLE^(mc->tempDecodedDST&1)]));
+   }
+   else{
+      mc->_mem->Write(mc->tempMAR & ~(LL)0x7, mc->_mem->BESetWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7), mc->_fpr[mc->tempDecodedDST>>1].l[FP_TWIDDLE^(mc->tempDecodedDST&1)]));
+   }
 }
 
 void
 Mipc::mem_sb (Mipc *mc)
 {
+   if(mc->MEMPATH_check){
+   mc->_mem->Write(mc->tempMAR & ~(LL)0x7, mc->_mem->BESetByte (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7), mc->MEMPATH & 0xff));
+   }
+   else{
    mc->_mem->Write(mc->tempMAR & ~(LL)0x7, mc->_mem->BESetByte (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7), mc->_gpr[mc->tempDecodedDST] & 0xff));
+}
 }
 
 void
 Mipc::mem_sh (Mipc *mc)
 {
+   if(mc->MEMPATH_check){
+   mc->_mem->Write(mc->tempMAR & ~(LL)0x7, mc->_mem->BESetHalfWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7), mc->MEMPATH & 0xffff));
+
+   }
+   else{
    mc->_mem->Write(mc->tempMAR & ~(LL)0x7, mc->_mem->BESetHalfWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7), mc->_gpr[mc->tempDecodedDST] & 0xffff));
+}
 }
 
 void
@@ -1360,17 +1398,29 @@ Mipc::mem_swl (Mipc *mc)
 
    ar1 = mc->_mem->BEGetWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7));
    s1 = (mc->tempMAR & 3) << 3;
-   ar1 = (mc->_gpr[mc->tempDecodedDST] >> s1) | (ar1 & ~(~(unsigned)0 >> s1));
+   if(mc->MEMPATH_check){
+         ar1 = (mc->MEMPATH >> s1) | (ar1 & ~(~(unsigned)0 >> s1));
+
+   }
+   else{
+      ar1 = (mc->_gpr[mc->tempDecodedDST] >> s1) | (ar1 & ~(~(unsigned)0 >> s1));
+   }
    mc->_mem->Write(mc->tempMAR & ~(LL)0x7, mc->_mem->BESetWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7), ar1));
 }
 
 void
 Mipc::mem_sw (Mipc *mc)
 {
-#ifdef MIPC_DEBUG
-            fprintf(mc->_debugLog, "INSIDE STORE.. OUTPUT = %#x\n",mc->_gpr[mc->tempDecodedDST]);
-#endif
+// #ifdef MIPC_DEBUG
+//             fprintf(mc->_debugLog, "INSIDE STORE.. OUTPUT = %#x\n",mc->_gpr[mc->tempDecodedDST]);
+// #endif
+   if(mc->MEMPATH_check){
+   mc->_mem->Write(mc->tempMAR & ~(LL)0x7, mc->_mem->BESetWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7), mc->MEMPATH));
+
+   }
+   else{
    mc->_mem->Write(mc->tempMAR & ~(LL)0x7, mc->_mem->BESetWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7), mc->_gpr[mc->tempDecodedDST]));
+}
 }
 
 void
@@ -1380,6 +1430,11 @@ Mipc::mem_swr (Mipc *mc)
 
    ar1 = mc->_mem->BEGetWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7));
    s1 = (~mc->tempMAR & 3) << 3;
+   if(mc->MEMPATH_check){
+   ar1 = (mc->MEMPATH_check << s1) | (ar1 & ~(~0UL << s1));
+   }
+   else{
    ar1 = (mc->_gpr[mc->tempDecodedDST] << s1) | (ar1 & ~(~0UL << s1));
+   }
    mc->_mem->Write(mc->tempMAR & ~(LL)0x7, mc->_mem->BESetWord (mc->tempMAR, mc->_mem->Read(mc->tempMAR & ~(LL)0x7), ar1));
 }

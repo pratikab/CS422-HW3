@@ -7,13 +7,6 @@ Exe::Exe (Mipc *mc)
 
 Exe::~Exe (void) {}
 
-void load_interlock(Mipc *mc){
-   mc->ID_EX.reset();
-   mc->set_pc_3 = mc->_pc;
-   mc->set_pc_2 = mc->IF_ID._pc;
-   mc->set_ins = mc->IF_ID._ins;
-}
-
 void
 Exe::MainLoop (void)
 {
@@ -52,59 +45,45 @@ Exe::MainLoop (void)
          _mc->temppc_ = pc;
 
          source1 = _mc->ID_EX.src1reg;
-         source2 = _mc->ID_EX.src2reg;           
-         if(_mc->prev_isLoad){
-            if(source1 == _mc->prev1DST ){
-               load_interlock(_mc);
-#ifdef MIPC_DEBUG
-            fprintf(_mc->_debugLog, "LOAD INTERLOCK\n");
-#endif            
-            }
-            else if(source2 == _mc->prev1DST){
-               load_interlock(_mc);
-#ifdef MIPC_DEBUG
-            fprintf(_mc->_debugLog, "LOAD INTERLOCK\n");
-#endif
-            }    
-         }
+         source2 = _mc->ID_EX.src2reg; 
+
          bool flag = FALSE;
-         if(!_mc->prevMEM){
-            if(source1 == _mc->prev1DST ){
+         if(!_mc->prevMEM ){
+            if(source1 == _mc->prev1DST && source1 != 0){
                flag = TRUE;
                _mc->ID_EX._decodedSRC1 = _mc->EX_MEM._opResultLo;
                if(_mc->toUpdateBranch){
                    _mc->ID_EX._btgt = _mc->ID_EX._decodedSRC1;
                }
 #ifdef MIPC_DEBUG
-            fprintf(_mc->_debugLog, "EX-EX bypass from %d to %d\n",  _mc->prev1DST,source1);
+            fprintf(_mc->_debugLog, "EX-EX bypass(%#x) from %d to %d\n", _mc->EX_MEM._opResultLo, _mc->prev1DST,source1);
 #endif            
             }
-            else if(source2 == _mc->prev1DST){
+            else if(source2 == _mc->prev1DST && source2 != 0){
                flag = TRUE;
                _mc->ID_EX._decodedSRC2 = _mc->EX_MEM._opResultLo;
 #ifdef MIPC_DEBUG
-            fprintf(_mc->_debugLog, "EX-EX bypass from %d to %d\n", _mc->prev1DST,source2);
+            fprintf(_mc->_debugLog, "EX-EX bypass(%#x) from %d to %d\n", _mc->EX_MEM._opResultLo,_mc->prev1DST,source2);
 #endif
             }  
          }
          if(!_mc->isStore3 && !flag){
-            if(source1 == _mc->prev2DST){
+            if(source1 == _mc->prev2DST && source1 != 0){
                _mc->ID_EX._decodedSRC1 = _mc->MEM_WB._opResultLo;
                if(_mc->toUpdateBranch){
-                   _mc->ID_EX._btgt = _mc->MEM_WB._decodedSRC1;
+                   _mc->ID_EX._btgt = _mc->ID_EX._decodedSRC1;
                }
 #ifdef MIPC_DEBUG
-            fprintf(_mc->_debugLog, "MEM-EX bypass from %d to %d\n", _mc->prev2DST,source1);
+            fprintf(_mc->_debugLog, "MEM-EX bypass(%#x) from %d to %d\n",_mc->MEM_WB._opResultLo, _mc->prev2DST,source1);
 #endif            
             }
-            else if(source2 == _mc->prev2DST){
+            else if(source2 == _mc->prev2DST && source2 != 0){
                _mc->ID_EX._decodedSRC2 = _mc->MEM_WB._opResultLo;
 #ifdef MIPC_DEBUG
-            fprintf(_mc->_debugLog, "MEM-EX bypass from %d to %d\n",_mc->prev2DST,source2);
+            fprintf(_mc->_debugLog, "MEM-EX bypass(%#x) from %d to %d\n",_mc->MEM_WB._opResultLo,_mc->prev2DST,source2);
 #endif
             }  
          }        
-         btgt = _mc->ID_EX._btgt;
          if (!isSyscall && !isIllegalOp) {
             if (_mc->ID_EX._opControl != NULL)
                _mc->ID_EX._opControl(_mc,ins);
@@ -123,8 +102,11 @@ Exe::MainLoop (void)
 #endif
 
          }
-
+         btgt = _mc->ID_EX._btgt;
          btaken = _mc->b_taken;
+// #ifdef MIPC_DEBUG
+//             fprintf(_mc->_debugLog, "BRANCH TARGET = %#x , BRANCH TAKEN = %d\n",btgt,btaken);
+// #endif
          decodedDST=_mc->ID_EX._decodedDST;
          mar_ = _mc->mar;
          if (!isIllegalOp && !isSyscall) {
