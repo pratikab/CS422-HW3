@@ -73,15 +73,15 @@ Exe::MainLoop (void)
                if(_mc->toUpdateBranch){
                    _mc->ID_EX._btgt = _mc->ID_EX._decodedSRC1;
                }
-#ifdef MIPC_DEBUG
-            fprintf(_mc->_debugLog, "MEM-EX bypass(%#x) from %d to %d\n",_mc->MEM_WB._opResultLo, _mc->prev2DST,source1);
-#endif            
+// #ifdef MIPC_DEBUG
+//             fprintf(_mc->_debugLog, "MEM-EX bypass(%#x) from %d to %d\n",_mc->MEM_WB._opResultLo, _mc->prev2DST,source1);
+// #endif            
             }
             else if(source2 == _mc->prev2DST && source2 != 0){
                _mc->ID_EX._decodedSRC2 = _mc->MEM_WB._opResultLo;
-#ifdef MIPC_DEBUG
-            fprintf(_mc->_debugLog, "MEM-EX bypass(%#x) from %d to %d\n",_mc->MEM_WB._opResultLo,_mc->prev2DST,source2);
-#endif
+// #ifdef MIPC_DEBUG
+//             fprintf(_mc->_debugLog, "MEM-EX bypass(%#x) from %d to %d\n",_mc->MEM_WB._opResultLo,_mc->prev2DST,source2);
+// #endif
             }  
          }        
          if (!isSyscall && !isIllegalOp) {

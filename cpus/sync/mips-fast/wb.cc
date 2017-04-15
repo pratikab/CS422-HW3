@@ -58,7 +58,7 @@ Writeback::MainLoop (void)
             if (writeReg) {
                _mc->_gpr[decodedDST] = opResultLo;
 #ifdef MIPC_DEBUG
-               fprintf(_mc->_debugLog, "<%llu> Writing to reg %u, value: %#x, ins %#x\n", SIM_TIME, decodedDST, opResultLo,ins);
+               fprintf(_mc->_debugLog, "<%llu> Writing to reg %u, value: %#x\n", SIM_TIME, decodedDST, opResultLo);
 #endif
             }
             else if (writeFReg) {

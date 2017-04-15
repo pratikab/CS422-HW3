@@ -56,17 +56,17 @@ Memory::MainLoop (void)
 
          flag = FALSE;
          AWAIT_P_PHI1;  // @negedge   
-         if(temp_isstore){
-            if(_mc->tempDecodedDST == temp_prev1DST){
-               _mc->MEMPATH = temp_memwb;
-               _mc->MEMPATH_check = TRUE;
-               // _mc->_gpr[_mc->tempDecodedDST] = temp_memwb;
-               flag = TRUE;
-#ifdef MIPC_DEBUG
-            fprintf(_mc->_debugLog, "MEM-MEM bypass %d to %d\n",_mc->tempDecodedDST, temp_prev1DST);
-#endif  
-            }
-         }
+//          if(temp_isstore){
+//             if(_mc->tempDecodedDST == temp_prev1DST){
+//                _mc->MEMPATH = temp_memwb;
+//                _mc->MEMPATH_check = TRUE;
+//                // _mc->_gpr[_mc->tempDecodedDST] = temp_memwb;
+//                flag = TRUE;
+// #ifdef MIPC_DEBUG
+//             fprintf(_mc->_debugLog, "MEM-MEM bypass(%#x) %d to %d \n",temp_memwb ,_mc->tempDecodedDST, temp_prev1DST);
+// #endif  
+//             }
+//          }
 
          if (memControl) {
              memOp(_mc);
